@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <Label Content="Server IP: " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="58"/>
+        <Label Content="Name: " HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="58"/>
+        <TextBox  HorizontalAlignment="Left" Height="23" Margin="73,14,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="120"/>
+        <TextBox HorizontalAlignment="Left" Height="22" Margin="73,45,0,0" TextWrapping="Wrap" Text="Чилипиздрик" VerticalAlignment="Top" Width="120"/>
+
     </Grid>
 </Window>
