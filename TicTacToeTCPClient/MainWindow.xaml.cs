@@ -25,7 +25,10 @@ namespace TicTacToeTCPClient {
 		NetworkStream stream;
 		Thread listeningThread;
 
+		Queue<string> recievedData;
+
 		public MainWindow() {
+			recievedData = new Queue<string>();
 			InitializeComponent();
 		}
 
@@ -52,18 +55,25 @@ namespace TicTacToeTCPClient {
 					listeningThread = new Thread(new ThreadStart(ReadData));
 					listeningThread.Start();
 
+					_ConnectionStatus.Content = "Connected";
 
+					while (true) {
+						var msg = recievedData.Dequeue();
+						if (msg != null) {
+							test_area.Content += Environment.NewLine + msg;
+						}
+						Thread.Sleep(16);
+					}
 				} catch (SocketException e) {
-					Console.WriteLine($"SocketException: {e}");
+					_ConnectionStatus.Content = $"SocketException: {e}";
 				} catch (Exception e) {
-					Console.WriteLine($"Exception: {e.Message}");
+					_ConnectionStatus.Content = $"Exception: {e.Message}";
 				} finally {
 					Disconnect();
 				}
 			}
 		}
 
-		Queue<string> recievedData;
 		void ReadData() {
 			StringBuilder builder = new StringBuilder();
 			while (client.Connected) {
