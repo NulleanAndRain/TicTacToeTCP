@@ -52,8 +52,10 @@ namespace TicTacToeTCPClient {
 					client = new TcpClient(_IP_text.Text, port);
 					stream = client.GetStream();
 
-					listeningThread = new Thread(new ThreadStart(ReadData));
+					listeningThread = new Thread(ReadData);
 					listeningThread.Start();
+
+					WriteData(_Name_text.Text);
 
 					_ConnectionStatus.Content = "Connected";
 
