@@ -9,9 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToeTCPClient", "TicTa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonClasses", "CommonClasses\CommonClasses.csproj", "{4402E861-4722-48EA-9423-2150C53A44FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpTestServer", "TcpTestServer\TcpTestServer.csproj", "{A045E3C3-D1D7-48B0-B92A-37E92C6CFB00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpTestServer", "TcpTestServer\TcpTestServer.csproj", "{A045E3C3-D1D7-48B0-B92A-37E92C6CFB00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatClientTest", "ChatClientTest\ChatClientTest.csproj", "{D8076524-BF29-47FA-ACC6-C08AD68F4E18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatClientTest", "ChatClientTest\ChatClientTest.csproj", "{D8076524-BF29-47FA-ACC6-C08AD68F4E18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleClient", "TestConsoleClient\TestConsoleClient.csproj", "{57730478-CA97-4BAB-A13D-D1D0EA43BF91}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{D8076524-BF29-47FA-ACC6-C08AD68F4E18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8076524-BF29-47FA-ACC6-C08AD68F4E18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8076524-BF29-47FA-ACC6-C08AD68F4E18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57730478-CA97-4BAB-A13D-D1D0EA43BF91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57730478-CA97-4BAB-A13D-D1D0EA43BF91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57730478-CA97-4BAB-A13D-D1D0EA43BF91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57730478-CA97-4BAB-A13D-D1D0EA43BF91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
