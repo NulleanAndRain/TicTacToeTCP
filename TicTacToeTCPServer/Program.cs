@@ -29,7 +29,7 @@ namespace TicTacToeTCPServer
                 }
                 while (stream.DataAvailable); // пока данные есть в потоке
 
-                Console.WriteLine(response.ToString());
+                Console.WriteLine("response ", response.ToString());
 
                 // Закрываем потоки
                 stream.Close();
