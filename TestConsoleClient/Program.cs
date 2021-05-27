@@ -1,58 +1,80 @@
-﻿using System;
+﻿#define UseNewClient
+
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
 namespace TestConsoleClient {
+#if UseNewClient
 	#region Client
-	//class Program {
-	//	static void Main(string[] args) {
-	//		Console.WriteLine("Hello World!");
-	//	}
-	//}
+
+	class Program {
+		static void Main(string[] args) {
+			Client client = new Client();
+			Console.Write("Enter name: ");
+			var name = Console.ReadLine();
+			Console.WriteLine("Connecting...");
+			Console.WriteLine(client.Connect("127.0.0.1", 8888, name));
+		}
+	}
 
 	class Client {
 		TcpClient client;
 		NetworkStream stream;
 		Thread listeningThread;
+		Thread consoleWritingThread;
 
 		Queue<string> recievedData;
 
-		private void Connect(string IP, string portStr, string name) {
-			if (!string.IsNullOrWhiteSpace(IP) &&
-				int.TryParse(portStr, out int port) &&
-				string.IsNullOrWhiteSpace(name)) {
-				try {
+		public Client() {
+			recievedData = new Queue<string>();
+		}
 
-					//todo: connect to server
+		public bool Connect(string IP, int port, string name) {
+			try {
 
-					client = new TcpClient(IP, port);
-					stream = client.GetStream();
+				//todo: connect to server
 
-					listeningThread = new Thread(ReadData);
-					listeningThread.Start();
+				client = new TcpClient(IP, port);
+				stream = client.GetStream();
 
-					WriteData(name);
+				listeningThread = new Thread(ReadData);
+				listeningThread.Start();
 
-					//_ConnectionStatus.Content = "Connected";
-					Console.WriteLine("Connected");
+				consoleWritingThread = new Thread(WriteReceivedData);
+				consoleWritingThread.Start();
 
-					while (true) {
-						var msg = recievedData.Dequeue();
-						if (msg != null) {
-							//test_area.Content += Environment.NewLine + msg;
-							Console.WriteLine(msg);
-						}
-						Thread.Sleep(16);
-					}
-				} catch (SocketException e) {
-					Console.WriteLine($"SocketException: {e}");
-				} catch (Exception e) {
-					Console.WriteLine($"Exception: {e.Message}");
-				} finally {
-					Disconnect();
+				WriteData(name);
+
+				//_ConnectionStatus.Content = "Connected";
+				Console.WriteLine("Connected");
+
+				while (client.Connected) {
+					var msg = Console.ReadLine();
+					WriteData(msg);
 				}
+
+				return true;
+			} catch (SocketException e) {
+				Console.WriteLine($"SocketException: {e}");
+			} catch (Exception e) {
+				Console.WriteLine($"Exception: {e.Message}");
+			} finally {
+				Disconnect();
+				}
+			return false;
+		}
+
+		void WriteReceivedData() {
+			while (true) {
+				if (recievedData.Count > 0) {
+					var msg = recievedData.Dequeue();
+					//test_area.Content += Environment.NewLine + msg;
+					Console.WriteLine(msg);
+				}
+				Thread.Sleep(16);
 			}
 		}
 
@@ -78,14 +100,14 @@ namespace TestConsoleClient {
 			}
 		}
 
-		void WriteData(string data) {
+		public void WriteData(string data) {
 			if (stream != null && stream.CanWrite) {
 				byte[] bytes = Encoding.Unicode.GetBytes(data);
 				stream.Write(bytes, 0, bytes.Length);
 			}
 		}
 
-		private void Disconnect() {
+		public void Disconnect() {
 			if (client != null) {
 				// todo: disconect from server
 				stream?.Close();
@@ -100,7 +122,12 @@ namespace TestConsoleClient {
 		}
 
 	}
+
 	#endregion
+
+#else
+
+	#region ConsoleClient
 
 	class Program {
 		static string userName;
@@ -173,4 +200,7 @@ namespace TestConsoleClient {
 			Environment.Exit(0); //завершение процесса
 		}
 	}
+
+	#endregion
+#endif
 }
