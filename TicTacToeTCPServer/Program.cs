@@ -89,8 +89,17 @@ namespace TicTacToeTCPServer
 	}
 
 	class Client {
-		public Client(TcpClient client, Server server) { }
-		public void Process() { }
-		public void Close() { }
+		public Client(TcpClient client, Server server)
+        {
+
+        }
+		public void Process()
+        {
+
+        }
+		public void Close()
+        {
+
+        }
 	}
 }
