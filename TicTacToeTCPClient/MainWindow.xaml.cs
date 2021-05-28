@@ -25,6 +25,7 @@ namespace TicTacToeTCPClient {
 		NetworkStream stream;
 		Thread listeningThread;
 		Client mainClient = new Client();
+		string text_msg;
 
 		Queue<string> recievedData;
 
@@ -130,11 +131,8 @@ namespace TicTacToeTCPClient {
 		}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e) {
-			//var IP = _IP_text.Text;
-			//var Port = _Port_text.Text;
-			////Application.Run(new TestConsole);
-			//System.Diagnostics.Process.Start("TestConsoleClient.csproj");
-			//this.Close();
+			 text_msg = testInput.Text;
+			mainClient.WriteData(text_msg);
 		}
 
         private void _Port_text_TextChanged(object sender, TextChangedEventArgs e)
@@ -180,8 +178,8 @@ namespace TicTacToeTCPClient {
 
 				while (client.Connected)
 				{
-					var msg = Console.ReadLine();
-					WriteData(msg);
+					//var msg = text_msg;
+					//WriteData(msg);
 				}
 
 				return true;
@@ -207,7 +205,7 @@ namespace TicTacToeTCPClient {
 			{
 				if (recievedData.Count > 0)
 				{
-					var msg = recievedData.Dequeue();
+					var msg = "error"; /*MainWindow.text_msg;*/ /*recievedData.Dequeue();*/
 					//test_area.Content += Environment.NewLine + msg;
 					Console.WriteLine(msg);
 				}
