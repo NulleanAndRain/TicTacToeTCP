@@ -12,8 +12,8 @@ namespace TicTacToeTCPServer
 {
 	class Program {
 		static void Main(string[] args) {
-			ServerObject server = new ServerObject();
-			server.Listen("127.0.0.1", 8888);
+			Server server = new Server("127.0.0.1", 8888);
+			server.Start();
 		}
 
 	}
