@@ -102,8 +102,21 @@ namespace TicTacToeTCPServer
         public bool isEmpty => client1 == null && client2 == null;
 
         bool inProcess;
+        int fieldSize;
+        int rowSize;
 
+        void sendMessage(string message) {
 
+		}
+
+        void CastRoomInfo() {
+            JSONNode json = new JSONObject();
+            json["type"] = "room_info";
+            JSONNode data = new JSONObject();
+            data["field_size"] = fieldSize;
+            data["row_size"] = rowSize;
+            json["data"] = data;
+        }
 
         public void AddUser(ClientObject user) {
             if (client1 == null) {
@@ -130,7 +143,7 @@ namespace TicTacToeTCPServer
                 //if (json["data"]["command"] == "start")
 
             }
-            if (inProcess && json["type"] == "room_data") {
+            if (inProcess && json["type"] == "game_data") {
 
 			}
         }
@@ -194,6 +207,12 @@ namespace TicTacToeTCPServer
                 Close();
             }
         }
+
+        public void SennMessage(string msg) {
+            byte[] data = Encoding.Unicode.GetBytes(msg);
+            Stream.Write(data, 0, data.Length);
+
+		}
 
         // чтение входящего сообщения и преобразование в строку
         private string GetMessage() {
