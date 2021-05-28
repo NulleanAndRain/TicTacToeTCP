@@ -24,6 +24,7 @@ namespace TicTacToeTCPClient {
 		TcpClient client;
 		NetworkStream stream;
 		Thread listeningThread;
+		Client mainClient = new Client();
 
 		Queue<string> recievedData;
 
@@ -34,14 +35,18 @@ namespace TicTacToeTCPClient {
         }
 
 		private void Button_Click(object sender, RoutedEventArgs e) {
-			//var _name = _Name_text.Text;
-			//var _IP = _IP_text.Text;
-   //         int _port = int.Parse(_Port_text.Text);
+            var _name = _Name_text.Text;
+            var _IP = _IP_text.Text;
+            int _port = int.Parse(_Port_text.Text);
             //Connect(_IP, _port ,_name);
-            if (client == null) {
+            
+
+			if (client == null) {
 				Connect();
+				mainClient.Connect(_IP, _port, _name);
 			} else {
 				Disconnect();
+				mainClient.Disconnect();
 			}
 		}
 
