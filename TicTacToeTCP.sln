@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpTestServer", "TcpTestSer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatClientTest", "ChatClientTest\ChatClientTest.csproj", "{D8076524-BF29-47FA-ACC6-C08AD68F4E18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleClient", "TestConsoleClient\TestConsoleClient.csproj", "{57730478-CA97-4BAB-A13D-D1D0EA43BF91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsoleClient", "TestConsoleClient\TestConsoleClient.csproj", "{57730478-CA97-4BAB-A13D-D1D0EA43BF91}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

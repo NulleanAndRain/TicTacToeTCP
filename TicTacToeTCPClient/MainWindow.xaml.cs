@@ -120,7 +120,14 @@ namespace TicTacToeTCPClient {
 		}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e) {
-
+			var IP = _IP_text.Text;
+			var Port = _Port_text.Text;
+			//Application.Run(new TestConsole);
 		}
-	}
+
+        private void _Port_text_TextChanged(object sender, TextChangedEventArgs e)
+        {
+			///удалить этот метод
+        }
+    }
 }

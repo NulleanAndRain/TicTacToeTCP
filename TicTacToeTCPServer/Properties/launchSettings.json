@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "TicTacToeTCPServer": {
+      "commandName": "Project"
+    }
+  }
+}
