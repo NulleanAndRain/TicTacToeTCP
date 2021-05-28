@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using SimpleJSON;
+//using CommonClasses;
 
 namespace TicTacToeTCPServer
 {
@@ -17,14 +19,18 @@ namespace TicTacToeTCPServer
 	}
 
 	#region Server alt
-	class Server {
+	public class Server {
 		TcpListener listener;
-		List<Client> clients;
+		List<ClientObject> clients;
+
+        List<Room> rooms;
 
 		public Server(string IP, int port) {
-			clients = new List<Client>();
+			clients = new List<ClientObject>();
 			listener = new TcpListener(IPAddress.Parse(IP), port);
-		}
+            rooms = new List<Room>();
+
+        }
 
 		public void Start() {
 			try {
@@ -34,10 +40,9 @@ namespace TicTacToeTCPServer
 				while (true) {
 					TcpClient tcpClient = listener.AcceptTcpClient();
 
-					Client clientObject = new Client(tcpClient, this);
-					Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
-					clientThread.Start();
+                    ClientObject clientObject = new ClientObject(tcpClient, this);
 
+                    clientObject.Init();
 					clients.Add(clientObject);
 					Thread.Sleep(5);
 				}
@@ -45,123 +50,94 @@ namespace TicTacToeTCPServer
 				Console.WriteLine(ex.Message);
 				Disconnect();
 			}
-		}
-
-		void Disconnect() {
-			listener.Stop(); //остановка сервера
-			foreach (var client in clients) {
-				client.Close();
-			}
-			Environment.Exit(0); //завершение процесса
-		}
-
-		void Listen() {
-			while (true) {
-
-				Thread.Sleep(5);
-			}
-		}
-
-		//public void Start() {
-		//	listener.Start();
-		//	listeningThread = new Thread(ReadData);
-		//	listeningThread.Start();
-		//	while (true) {
-		//		if (recievedData.Count > 0) {
-		//			Console.WriteLine(recievedData.Dequeue());
-		//		}
-		//		Thread.Sleep(16);
-		//	}
-		//}
-
-		//void ReadData() {
-		//	StringBuilder builder = new StringBuilder();
-		//	while (true) {
-		//		// todo: data reading
-		//		try {
-		//			byte[] buffer = new byte[256];
-		//			int bytes;
-		//			do {
-		//				bytes = stream.Read(buffer, 0, buffer.Length);
-		//				builder.Append(Encoding.Unicode.GetString(buffer, 0, bytes));
-		//			} while (stream.DataAvailable);
-
-		//			recievedData.Enqueue(builder.ToString());
-		//			builder.Clear();
-		//		} catch {
-		//			//Disconnect();
-		//		}
-
-		//		Thread.Sleep(16);
-		//	}
-		//}
-	}
-
-    class Client {
-        public Client(TcpClient client, Server server) { }
-        public void Process() { }
-        public void Close() { }
-    }
-
-	#endregion
-
-	#region ServerObject
-
-	public class ServerObject {
-        static TcpListener tcpListener; // сервер для прослушивания
-        List<ClientObject> clients = new List<ClientObject>(); // все подключения
-
+        }
         protected internal void AddConnection(ClientObject clientObject) {
             clients.Add(clientObject);
+            findEmptyRoom().AddUser(clientObject);
         }
         protected internal void RemoveConnection(string id) {
             // получаем по id закрытое подключение
             ClientObject client = clients.FirstOrDefault(c => c.Id == id);
             // и удаляем его из списка подключений
-            if (client != null)
+            if (client != null) {
                 clients.Remove(client);
-        }
-        // прослушивание входящих подключений
-        protected internal void Listen(string IP, int port) {
-            try {
-                tcpListener = new TcpListener(IPAddress.Parse(IP), port);
-                tcpListener.Start();
-                Console.WriteLine("Сервер запущен. Ожидание подключений...");
-
-                while (true) {
-                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
-
-                    ClientObject clientObject = new ClientObject(tcpClient, this);
-                    Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
-                    clientThread.Start();
-                }
-            } catch (Exception ex) {
-                Console.WriteLine(ex.Message);
-                Disconnect();
+                var r = client.room;
+                r.RemoveUser(client);
+                if (r.isEmpty) {
+                    rooms.Remove(r);
+				}
             }
         }
 
-        // трансляция сообщения подключенным клиентам
-        protected internal void BroadcastMessage(string message, string id) {
-            byte[] data = Encoding.Unicode.GetBytes(message);
-            for (int i = 0; i < clients.Count; i++) {
-                if (clients[i].Id != id) // если id клиента не равно id отправляющего
-                {
-                    clients[i].Stream.Write(data, 0, data.Length); //передача данных
-                }
-            }
-        }
-        // отключение всех клиентов
+        Room findEmptyRoom() {
+            var r = rooms.Find(r => r.hasSpace);
+            if (r == null) {
+                r = new Room();
+                rooms.Add(r);
+			}
+            return r;
+		}
+
         protected internal void Disconnect() {
-            tcpListener.Stop(); //остановка сервера
+            listener.Stop(); //остановка сервера
 
             for (int i = 0; i < clients.Count; i++) {
                 clients[i].Close(); //отключение клиента
             }
             Environment.Exit(0); //завершение процесса
         }
+
+        protected internal void BroadcastMessage(string message, string id) {
+            var sender = clients.Find(c => c.Id == id);
+            sender.room.ProcessMessage(message, id);
+        }
     }
-    #endregion
+
+    public class Room {
+        public ClientObject client1;
+        public ClientObject client2;
+        public Server server1;
+
+        public bool hasSpace => client1 == null || client2 == null;
+        public bool isEmpty => client1 == null && client2 == null;
+
+        bool inProcess;
+
+
+
+        public void AddUser(ClientObject user) {
+            if (client1 == null) {
+                client1 = user;
+                return;
+            }
+            if (client2 == null) {
+                client2 = user;
+            }
+        }
+
+        public void RemoveUser(ClientObject user) {
+            if (client1 == user) {
+                client1 = null;
+			}
+            if (client2 == user) {
+                client2 = null;
+			}
+		}
+
+        protected internal void ProcessMessage(string message, string id) {
+            JSONNode json = JSON.Parse(message);
+            if (!inProcess && json["type"] == "room_info") {
+                //if (json["data"]["command"] == "start")
+
+            }
+            if (inProcess && json["type"] == "room_data") {
+
+			}
+        }
+    }
+
+	#endregion
+
 
     #region ClientObject
 
@@ -170,13 +146,19 @@ namespace TicTacToeTCPServer
         protected internal NetworkStream Stream { get; private set; }
         string userName;
         TcpClient client;
-        ServerObject server; // объект сервера
+        Server server; // объект сервера
+        public Room room;
 
-        public ClientObject(TcpClient tcpClient, ServerObject serverObject) {
+        public ClientObject(TcpClient tcpClient, Server serverObject) {
             Id = Guid.NewGuid().ToString();
             client = tcpClient;
             server = serverObject;
             serverObject.AddConnection(this);
+        }
+
+        public void Init() {
+            Thread clientThread = new Thread(new ThreadStart(Process));
+            clientThread.Start();
         }
 
         public void Process() {
