@@ -11,7 +11,7 @@
             <Label Content="Server IP: " HorizontalAlignment="Left" Margin="10,12,0,0" VerticalAlignment="Top" Width="58"/>
             <TextBox x:Name="_IP_text" HorizontalAlignment="Left" Height="23" Margin="73,16,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="120"/>
             <Label Content="Port:" HorizontalAlignment="Left" Margin="10,44,0,0" VerticalAlignment="Top" Width="58"/>
-            <TextBox x:Name="_Port_text" HorizontalAlignment="Left" Height="22" Margin="73,48,0,0" TextWrapping="Wrap" Text="25656" VerticalAlignment="Top" Width="120" TextChanged="_Port_text_TextChanged"/>
+            <TextBox x:Name="_Port_text" HorizontalAlignment="Left" Height="22" Margin="73,48,0,0" TextWrapping="Wrap" Text="8888" VerticalAlignment="Top" Width="120" TextChanged="_Port_text_TextChanged"/>
             <Label Content="Name: " HorizontalAlignment="Left" Margin="10,75,0,0" VerticalAlignment="Top" Width="58"/>
             <TextBox x:Name="_Name_text" HorizontalAlignment="Left" Height="22" Margin="73,79,0,0" TextWrapping="Wrap" Text="Безымянный" VerticalAlignment="Top" Width="120"/>
             <Button x:Name="_Connect_Btn" Content="Connect" HorizontalAlignment="Left" Margin="118,106,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
