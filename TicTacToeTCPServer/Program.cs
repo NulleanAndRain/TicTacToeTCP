@@ -161,11 +161,9 @@ namespace TicTacToeTCPServer
         void sendUsrData() {
             if (client1 != null) {
                 client1.SendMessage(usrData(client1.Id));
-                Console.WriteLine("sent data to user 1");
             }
             if (client2 != null) {
                 client2.SendMessage(usrData(client2.Id));
-                Console.WriteLine("sent data to user 2");
             }
         }
 
@@ -179,18 +177,21 @@ namespace TicTacToeTCPServer
             var cmd = args[0];
             if (cmd == "//add") {
                 // on connection
-                Console.WriteLine("add");
                 sendMessage($"//msg {args[1]} connected", id);
                 sendUsrData();
                 return;
             }
             if (cmd == "//msg") {
-                sendMessage($"//msg {args[1]}: {args[2]}", id);
+                if (args[2] == "//swp") {
+                    swapUsers();
+                    sendUsrData();
+                } else {
+                    sendMessage($"//msg {args[1]}: {args[2]}", id);
+                }
                 return;
 			}
             if (cmd == "//rem") {
                 // on disconnect
-                Console.WriteLine("rem");
                 remUserWithId(id);
                 if (client1 == null && client2 != null) swapUsers();
                 sendUsrData();
