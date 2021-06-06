@@ -48,6 +48,9 @@ namespace TicTacToeTCPClient {
 			Closed += close;
 			_usr1.Background = transp;
 			_usr2.Background = transp;
+			_WinnerText.Content = "";
+
+			SetFieldSize(3);
 		}
 
 
@@ -173,6 +176,7 @@ namespace TicTacToeTCPClient {
 				if (stream == null) {
 					if (data != "\\disconnect")
 						Disconnect();
+					return;
 				}
 				if (stream.CanWrite) {
 					byte[] bytes = Encoding.Unicode.GetBytes(data);
@@ -217,19 +221,46 @@ namespace TicTacToeTCPClient {
 		private void SetFieldSize(int size) {
 			//if (size < 3) size = 3;
 			//if (size > 5) size = 5;
-		
+			//int sz = 30;
+			_Field.Children.Clear();
+			for (int i = 0; i < size; i++) {
+				var col = new StackPanel();
+				col.Width = 50;
+				col.VerticalAlignment = VerticalAlignment.Center;
+				col.HorizontalAlignment = HorizontalAlignment.Center;
+				for (int j = 0; j < size; j++) {
+					var btn = new Button();
+					void onClick(object sender, RoutedEventArgs e) {
+						WriteData($"//gm {i} {j}");
+					}
+					btn.Content = "";
+					btn.Name = $"_{i}_{j}";
+					btn.Click += onClick;
+					btn.Width = 40;
+					btn.Height = 40;
+					btn.Margin = new Thickness(5);
+					btn.HorizontalAlignment = HorizontalAlignment.Center;
+					btn.VerticalAlignment = VerticalAlignment.Center;
+					col.Children.Add(btn);
+				}
+				_Field.Children.Add(col);
+			}
+			//_StackHor
 		}
 
 		private void Btn_size3(object sender, RoutedEventArgs e) {
 			WriteData("//sz 3");
+			SetFieldSize(3);
 		}
 
 		private void Btn_size4(object sender, RoutedEventArgs e) {
 			WriteData("//sz 4");
+			SetFieldSize(4);
 		}
 
 		private void Btn_size5(object sender, RoutedEventArgs e) {
 			WriteData("//sz 5");
+			SetFieldSize(5);
 		}
 	}
 }

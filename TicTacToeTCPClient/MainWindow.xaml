@@ -34,7 +34,9 @@
 
         <Label x:Name="test_area" Content="" HorizontalAlignment="Left" Margin="634,26,0,0" VerticalAlignment="Top" Height="359" Width="148"/>
         <TextBox x:Name="testInput" HorizontalAlignment="Left" Height="23" Margin="321,362,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Button  Content="Send" HorizontalAlignment="Left" Margin="464,362,0,0" VerticalAlignment="Top" Width="75" Click="SendMsgBtn" Height="23"/>
 
-        <Label x:Name="WinnerText" Content="Winner:" HorizontalAlignment="Left" Margin="359,26,0,0" VerticalAlignment="Top" Width="180"/>
+        <Label x:Name="_WinnerText" Content="Winner:" HorizontalAlignment="Left" Margin="359,26,0,0" VerticalAlignment="Top" Width="180"/>
+        <StackPanel x:Name="_Field" HorizontalAlignment="Center" Height="272" Margin="321,57,190,90" VerticalAlignment="Center" Width="281" Orientation="Horizontal"/>
     </Grid>
 </Window>
