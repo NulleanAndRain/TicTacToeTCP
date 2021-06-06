@@ -11,8 +11,10 @@ namespace TcpTestServer {
         static ServerObject server; // сервер
         static Thread listenThread; // потока для прослушивания
         static void Main(string[] args) {
+            Console.Write("Enter IP: ");
+            var ip = Console.ReadLine();
             try {
-                server = new ServerObject();
+                server = new ServerObject(ip);
                 listenThread = new Thread(new ThreadStart(server.Listen));
                 listenThread.Start(); //старт потока
             } catch (Exception ex) {
@@ -102,6 +104,11 @@ namespace TcpTestServer {
     public class ServerObject {
         static TcpListener tcpListener; // сервер для прослушивания
         List<ClientObject> clients = new List<ClientObject>(); // все подключения
+        string _ip;
+
+        public ServerObject(string ip) {
+            _ip = ip;
+        }
 
         protected internal void AddConnection(ClientObject clientObject) {
             clients.Add(clientObject);
@@ -111,12 +118,13 @@ namespace TcpTestServer {
             ClientObject client = clients.Find(c => c.Id == id);
             // и удаляем его из списка подключений
             if (client != null)
-                clients.Remove(client);
+                if(clients.Contains(client))
+                    clients.Remove(client);
         }
         // прослушивание входящих подключений
         protected internal void Listen() {
             try {
-                tcpListener = new TcpListener(IPAddress.Any, 8888);
+                tcpListener = new TcpListener(IPAddress.Parse(_ip), 8888);
                 tcpListener.Start();
                 Console.WriteLine("Сервер запущен. Ожидание подключений...");
 
