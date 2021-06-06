@@ -60,15 +60,16 @@ namespace TicTacToeTCPServer
         }
         protected internal void RemoveConnection(string id) {
             // получаем по id закрытое подключение
-            ClientObject client = clients.FirstOrDefault(c => c.Id == id);
+            ClientObject client = clients.Find(c => c.Id == id);
             // и удаляем его из списка подключений
             if (client != null) {
                 clients.Remove(client);
                 var r = client.room;
+                if (r == null) return;
                 r.RemoveUser(client);
                 if (r.isEmpty) {
                     rooms.Remove(r);
-				}
+                }
             }
         }
 
@@ -201,7 +202,7 @@ namespace TicTacToeTCPServer
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
                     } catch {
-                        message = String.Format("{0}: покинул чат", userName);
+                        message = String.Format("{0} покинул чат", userName);
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
                         break;
