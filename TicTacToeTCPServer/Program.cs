@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using SimpleJSON;
 //using CommonClasses;
 
 namespace TicTacToeTCPServer
@@ -109,22 +108,9 @@ namespace TicTacToeTCPServer
         public bool hasSpace => client1 == null || client2 == null;
         public bool isEmpty => client1 == null && client2 == null;
 
-        bool inProcess;
-        int fieldSize;
-        int rowSize;
-
-        void sendMessage(string message, string id) {
-            if (client1 != null && client1.Id != id) client1.SendMessage(message);
-            if (client2 != null && client2.Id != id) client2.SendMessage(message);
-        }
-
-        void CastRoomInfo() {
-            JSONNode json = new JSONObject();
-            json["type"] = "room_info";
-            JSONNode data = new JSONObject();
-            data["field_size"] = fieldSize;
-            data["row_size"] = rowSize;
-            json["data"] = data;
+        void sendMessage(string message, string exceptId = null) {
+            if (client1 != null && client1.Id != exceptId) client1.SendMessage(message);
+            if (client2 != null && client2.Id != exceptId) client2.SendMessage(message);
         }
 
         public void AddUser(ClientObject user) {
@@ -147,15 +133,20 @@ namespace TicTacToeTCPServer
 		}
 
         protected internal void ProcessMessage(string message, string id) {
-            //JSONNode json = JSON.Parse(message);
-            //if (!inProcess && json["type"] == "room_info") {
-            //	//if (json["data"]["command"] == "start")
+            var args = message.Split(' ', 3);
+            var cmd = args[0];
+            if (cmd == "//add") {
+                // on connection
+                sendMessage($"{args[1]} connected", id);
+            }
+            if (cmd == "//msg") {
+                sendMessage($"{args[1]}: {args[2]}", id);
 
-            //}
-            //if (inProcess && json["type"] == "game_data") {
-
-            //}
-            sendMessage(message, id);
+			}
+            if (cmd == "//rem") {
+                // on disconnect
+                sendMessage($"{args[1]} disconected");
+			}
 		}
     }
 
@@ -167,10 +158,11 @@ namespace TicTacToeTCPServer
     public class ClientObject {
         protected internal string Id { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
-        string userName;
         TcpClient client;
         Server server; // объект сервера
         public Room room;
+
+        public string userName { get; private set; }
 
         public ClientObject(TcpClient tcpClient, Server serverObject) {
             Id = Guid.NewGuid().ToString();
@@ -191,7 +183,7 @@ namespace TicTacToeTCPServer
                 string message = GetMessage();
                 userName = message;
 
-                message = userName + " вошел в чат";
+                message = $"//add {userName}";
                 // посылаем сообщение о входе в чат всем подключенным пользователям
                 server.BroadcastMessage(message, this.Id);
                 Console.WriteLine(message);
@@ -201,11 +193,11 @@ namespace TicTacToeTCPServer
                         message = GetMessage();
                         if (string.IsNullOrEmpty(message)) continue;
                         if (message == "\\disconnect") throw new SocketException();
-                        message = String.Format("{0}: {1}", userName, message);
+                        message = $"//msg {userName} {message}";
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
                     } catch {
-                        message = String.Format("{0} покинул чат", userName);
+                        message = $"//rem {userName}";
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
                         break;
@@ -246,6 +238,7 @@ namespace TicTacToeTCPServer
                 Stream.Close();
             if (client != null)
                 client.Close();
+            room.RemoveUser(this);
         }
     }
 	#endregion
