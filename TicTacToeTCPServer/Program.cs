@@ -89,7 +89,8 @@ namespace TicTacToeTCPServer
 
         protected internal void BroadcastMessage(string message, string id) {
             var sender = clients.Find(c => c.Id == id);
-            sender.room.ProcessMessage(message, id);
+            if (sender.room != null)
+                sender.room.ProcessMessage(message, id);
         }
     }
 
@@ -106,8 +107,9 @@ namespace TicTacToeTCPServer
         int rowSize;
 
         void sendMessage(string message) {
-
-		}
+            if (client1 != null) client1.SendMessage(message);
+            if (client2 != null) client2.SendMessage(message);
+        }
 
         void CastRoomInfo() {
             JSONNode json = new JSONObject();
@@ -138,15 +140,16 @@ namespace TicTacToeTCPServer
 		}
 
         protected internal void ProcessMessage(string message, string id) {
-            JSONNode json = JSON.Parse(message);
-            if (!inProcess && json["type"] == "room_info") {
-                //if (json["data"]["command"] == "start")
+            //JSONNode json = JSON.Parse(message);
+            //if (!inProcess && json["type"] == "room_info") {
+            //	//if (json["data"]["command"] == "start")
 
-            }
-            if (inProcess && json["type"] == "game_data") {
+            //}
+            //if (inProcess && json["type"] == "game_data") {
 
-			}
-        }
+            //}
+            sendMessage(message);
+		}
     }
 
 	#endregion
@@ -208,7 +211,7 @@ namespace TicTacToeTCPServer
             }
         }
 
-        public void SennMessage(string msg) {
+        public void SendMessage(string msg) {
             byte[] data = Encoding.Unicode.GetBytes(msg);
             Stream.Write(data, 0, data.Length);
 

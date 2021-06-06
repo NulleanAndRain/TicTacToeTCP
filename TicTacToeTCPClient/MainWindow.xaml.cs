@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,11 @@ namespace TicTacToeTCPClient {
 		Thread listeningThread;
 
 		Queue<string> recievedData;
+
+		[DllImport("Kernel32")]
+		public static extern void AllocConsole();
+		[DllImport("Kernel32")]
+		public static extern void FreeConsole();
 
 		public MainWindow() {
 			recievedData = new Queue<string>();
@@ -119,8 +125,16 @@ namespace TicTacToeTCPClient {
 			_Connect_Btn.Content = "Connect";
 		}
 
-		private void Button_Click_1(object sender, RoutedEventArgs e) {
+		private void SendMsgBtn(object sender, RoutedEventArgs e) {
 
+		}
+
+		private void OpenConsoleBtn(object sender, RoutedEventArgs e) {
+			AllocConsole();
+		}
+
+		private void CloseConsoleBtn(object sender, RoutedEventArgs e) {
+			FreeConsole();
 		}
 	}
 }
