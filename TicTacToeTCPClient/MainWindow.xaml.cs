@@ -138,6 +138,10 @@ namespace TicTacToeTCPClient {
 		void WriteData(string data) {
 			if (string.IsNullOrEmpty(data)) return;
 			try {
+				if (stream == null) {
+					if (data != "\\disconnect")
+						Disconnect();
+				}
 				if (stream.CanWrite) {
 					byte[] bytes = Encoding.Unicode.GetBytes(data);
 					stream.Write(bytes, 0, bytes.Length);
