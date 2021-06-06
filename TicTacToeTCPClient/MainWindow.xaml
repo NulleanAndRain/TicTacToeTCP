@@ -20,10 +20,10 @@
             <Button x:Name="_Connect_Btn" Content="Connect" HorizontalAlignment="Left" Margin="118,106,0,0" VerticalAlignment="Top" Width="75" Click="ButtonConnect"/>
 
             <Label Name="_ConnectionStatus" Content="" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top" Width="183" Height="50"/>
+            <Button Content="3x3" HorizontalAlignment="Left" Height="30" Margin="23,196,0,0" VerticalAlignment="Top" Width="30"/>
+            <Button Content="4x4" HorizontalAlignment="Left" Height="30" Margin="84,196,0,0" VerticalAlignment="Top" Width="30"/>
+            <Button Content="5x5" HorizontalAlignment="Left" Height="30" Margin="144,196,0,0" VerticalAlignment="Top" Width="30"/>
         </Grid>
-
-        <Button  Content="Send" HorizontalAlignment="Left" Margin="500,153,0,0" VerticalAlignment="Top" Width="75" Click="SendMsgBtn"/>
-        <Label x:Name="test_area" Content="" HorizontalAlignment="Left" Margin="252,26,0,0" VerticalAlignment="Top" Height="98" Width="442"/>
-        <TextBox x:Name="testInput" HorizontalAlignment="Left" Height="23" Margin="375,150,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="389" Margin="219,3,0,0" VerticalAlignment="Top" Width="3"/>
     </Grid>
 </Window>
