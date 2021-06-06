@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace TicTacToeTCPClient {
 	/// <summary>
@@ -37,11 +38,26 @@ namespace TicTacToeTCPClient {
 			recievedData = new Queue<string>();
 			InitializeComponent();
 
-			//onDisconnect += showDisconnect;
+			void close(object s, EventArgs e) {
+				Disconnect();
+			}
+			Closed += close;
 		}
+
+
 		void showDisconnect() {
-			_ConnectionStatus.Content = "Disconnected";
-			_Connect_Btn.Content = "Connect";
+			void updateUI() {
+				_ConnectionStatus.Content = "Disconnected";
+				_Connect_Btn.Content = "Connect";
+			}
+			_ConnectionStatus.Dispatcher.Invoke(updateUI);
+		}
+
+		void addText(string msg) {
+			void update() {
+				test_area.Content += Environment.NewLine + msg;
+			}
+			test_area.Dispatcher.Invoke(update);
 		}
 
 		private void ButtonConnect(object sender, RoutedEventArgs e) {
@@ -53,7 +69,6 @@ namespace TicTacToeTCPClient {
 		}
 
 		private void Connect() {
-			Console.WriteLine("connect");
 			try {
 				_Connect_Btn.Content = "Disconnect";
 
@@ -67,29 +82,26 @@ namespace TicTacToeTCPClient {
 				listeningThread.Start();
 
 				WriteData(_Name_text.Text);
-				Console.WriteLine("name sent");
 
 				_ConnectionStatus.Content = "Connected";
 
 				//while (true) {
 				//	if (recievedData.Count > 0) {
 				//		var msg = recievedData.Dequeue();
-				//		test_area.Content += Environment.NewLine + msg;
 				//		//Console.WriteLine(msg);
 				//	}
 				//	Thread.Sleep(16);
 				//}
-				Thread.Sleep(100);
+				//Thread.Sleep(100);
 			} catch (SocketException e) {
 				_ConnectionStatus.Content = $"SocketException: {e}";
-				Console.WriteLine($"SocketException: {e}");
+				//Console.WriteLine($"SocketException: {e}");
 			} catch (Exception e) {
-				Console.WriteLine($"Exception: {e.Message}");
+				//Console.WriteLine($"Exception: {e.Message}");
 				_ConnectionStatus.Content = $"Exception: {e.Message}";
 			} finally {
-				_Connect_Btn.Content = "Connect";
-				Disconnect();
-				showDisconnect();
+				//_Connect_Btn.Content = "Connect";
+				//Disconnect();
 			}
 		}
 
@@ -108,7 +120,8 @@ namespace TicTacToeTCPClient {
 					if (string.IsNullOrEmpty(str)) continue;
 
 					Console.WriteLine(str);
-					recievedData.Enqueue(str);
+					addText(str);
+					//recievedData.Enqueue(str);
 					builder.Clear();
 				} catch (Exception e) {
 					Console.WriteLine("---- ex:" + e.ToString());
@@ -140,12 +153,16 @@ namespace TicTacToeTCPClient {
 
 				listeningThread.Interrupt();
 				listeningThread = null;
-				Console.WriteLine("disconnect");
+				showDisconnect();
 			}
 		}
 
 		private void SendMsgBtn(object sender, RoutedEventArgs e) {
-
+			var txt = testInput.Text;
+			testInput.Text = "";
+			if (string.IsNullOrEmpty(txt)) return;
+			addText(txt);
+			WriteData(txt);
 		}
 	}
 }
