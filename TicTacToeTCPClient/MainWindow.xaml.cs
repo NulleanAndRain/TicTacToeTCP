@@ -43,49 +43,49 @@ namespace TicTacToeTCPClient {
             
 
 			if (client == null) {
-				Connect();
+				//Connect();
 				mainClient.Connect(_IP, _port, _name);
 			} else {
-				Disconnect();
+				//Disconnect();
 				mainClient.Disconnect();
 			}
 		}
 
-		private void Connect() {
-			if (!string.IsNullOrWhiteSpace(_IP_text.Text) &&
-				int.TryParse(_Port_text.Text, out int port) &&
-				string.IsNullOrWhiteSpace(_Name_text.Text)) {
-				try {
-					_Connect_Btn.Content = "Disconnect";
+		//private void Connect() {
+		//	if (!string.IsNullOrWhiteSpace(_IP_text.Text) &&
+		//		int.TryParse(_Port_text.Text, out int port) &&
+		//		string.IsNullOrWhiteSpace(_Name_text.Text)) {
+		//		try {
+		//			_Connect_Btn.Content = "Disconnect";
 
-					//todo: connect to server
+		//			//todo: connect to server
 
-					client = new TcpClient(_IP_text.Text, port);
-					stream = client.GetStream();
+		//			client = new TcpClient(_IP_text.Text, port);
+		//			stream = client.GetStream();
 
-					listeningThread = new Thread(ReadData);
-					listeningThread.Start();
+		//			listeningThread = new Thread(ReadData);
+		//			listeningThread.Start();
 
-					WriteData(_Name_text.Text);
+		//			WriteData(_Name_text.Text);
 
-					_ConnectionStatus.Content = "Connected";
+		//			_ConnectionStatus.Content = "Connected";
 
-					while (true) {
-						var msg = recievedData.Dequeue();
-						if (msg != null) {
-							test_area.Content += Environment.NewLine + msg;
-						}
-						Thread.Sleep(16);
-					}
-				} catch (SocketException e) {
-					_ConnectionStatus.Content = $"SocketException: {e}";
-				} catch (Exception e) {
-					_ConnectionStatus.Content = $"Exception: {e.Message}";
-				} finally {
-					Disconnect();
-				}
-			}
-		}
+		//			while (true) {
+		//				var msg = recievedData.Dequeue();
+		//				if (msg != null) {
+		//					test_area.Content += Environment.NewLine + msg;
+		//				}
+		//				Thread.Sleep(16);
+		//			}
+		//		} catch (SocketException e) {
+		//			_ConnectionStatus.Content = $"SocketException: {e}";
+		//		} catch (Exception e) {
+		//			_ConnectionStatus.Content = $"Exception: {e.Message}";
+		//		} finally {
+		//			Disconnect();
+		//		}
+		//	}
+		////}
 
 		void ReadData() {
 			StringBuilder builder = new StringBuilder();
@@ -102,7 +102,7 @@ namespace TicTacToeTCPClient {
 					recievedData.Enqueue(builder.ToString());
 					builder.Clear();
 				} catch {
-					Disconnect();
+					//Disconnect();
 				}
 
 				Thread.Sleep(16);
@@ -116,19 +116,19 @@ namespace TicTacToeTCPClient {
 			}
 		}
 
-		private void Disconnect() {
-			if (client != null) {
-				// todo: disconect from server
-				stream?.Close();
-				client.Close();
-				client = null;
-				stream = null;
+		//private void Disconnect() {
+		//	if (client != null) {
+		//		// todo: disconect from server
+		//		stream?.Close();
+		//		client.Close();
+		//		client = null;
+		//		stream = null;
 
-				listeningThread?.Interrupt();
-				listeningThread = null;
-			}
-			_Connect_Btn.Content = "Connect";
-		}
+		//		listeningThread?.Interrupt();
+		//		listeningThread = null;
+		//	}
+		//	_Connect_Btn.Content = "Connect";
+		////}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e) {
 			 text_msg = testInput.Text;
