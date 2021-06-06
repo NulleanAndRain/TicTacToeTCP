@@ -26,7 +26,7 @@ namespace TicTacToeTCPClient {
 		NetworkStream stream;
 		Thread listeningThread;
 
-		Queue<string> recievedData;
+		volatile Queue<string> recievedData;
 
 		[DllImport("Kernel32")]
 		public static extern void AllocConsole();
@@ -36,6 +36,12 @@ namespace TicTacToeTCPClient {
 		public MainWindow() {
 			recievedData = new Queue<string>();
 			InitializeComponent();
+
+			//onDisconnect += showDisconnect;
+		}
+		void showDisconnect() {
+			_ConnectionStatus.Content = "Disconnected";
+			_Connect_Btn.Content = "Connect";
 		}
 
 		private void ButtonConnect(object sender, RoutedEventArgs e) {
@@ -47,6 +53,7 @@ namespace TicTacToeTCPClient {
 		}
 
 		private void Connect() {
+			Console.WriteLine("connect");
 			try {
 				_Connect_Btn.Content = "Disconnect";
 
@@ -60,17 +67,18 @@ namespace TicTacToeTCPClient {
 				listeningThread.Start();
 
 				WriteData(_Name_text.Text);
+				Console.WriteLine("name sent");
 
 				_ConnectionStatus.Content = "Connected";
 
-				while (true) {
-					if (recievedData.Count > 0) {
-						var msg = recievedData.Dequeue();
-						test_area.Content += Environment.NewLine + msg;
-						Console.WriteLine(msg);
-					}
-					Thread.Sleep(16);
-				}
+				//while (true) {
+				//	if (recievedData.Count > 0) {
+				//		var msg = recievedData.Dequeue();
+				//		test_area.Content += Environment.NewLine + msg;
+				//		Console.WriteLine(msg);
+				//	}
+				//	Thread.Sleep(16);
+				//}
 			} catch (SocketException e) {
 				_ConnectionStatus.Content = $"SocketException: {e}";
 				Console.WriteLine($"SocketException: {e}");
@@ -80,20 +88,21 @@ namespace TicTacToeTCPClient {
 			} finally {
 				_Connect_Btn.Content = "Connect";
 				Disconnect();
+				showDisconnect();
 			}
 		}
 
 		void ReadData() {
 			StringBuilder builder = new StringBuilder();
-			while (client.Connected) {
+			while (client!= null && client.Connected) {
 				// todo: data reading
 				try {
 					byte[] buffer = new byte[256];
 					int bytes;
-					do {
+					while (stream.DataAvailable) {
 						bytes = stream.Read(buffer, 0, buffer.Length);
 						builder.Append(Encoding.Unicode.GetString(buffer, 0, bytes));
-					} while (stream.DataAvailable);
+					}
 
 					recievedData.Enqueue(builder.ToString());
 					builder.Clear();
@@ -103,7 +112,9 @@ namespace TicTacToeTCPClient {
 					Thread.CurrentThread.Interrupt();
 				}
 
-				Thread.Sleep(16);
+				try {
+					Thread.Sleep(16);
+				} catch { }
 			}
 		}
 
@@ -118,7 +129,7 @@ namespace TicTacToeTCPClient {
 		private void Disconnect() {
 			if (client != null) {
 				// todo: disconect from server
-				stream?.Close();
+				stream.Close();
 				client.Close();
 				client = null;
 				stream = null;
@@ -127,7 +138,7 @@ namespace TicTacToeTCPClient {
 				listeningThread = null;
 			}
 			Console.WriteLine("disconnect");
-			//_Connect_Btn.Content = "Connect";
+			//Thread.CurrentThread.Send
 		}
 
 		private void SendMsgBtn(object sender, RoutedEventArgs e) {

@@ -61,10 +61,12 @@ namespace TcpTestServer
                 {
                     try
                     {
-                        message = GetMessage();
-                        message = String.Format("{0}: {1}", userName, message);
-                        Console.WriteLine(message);
-                        server.BroadcastMessage(message, this.Id);
+                        if (Stream.DataAvailable) {
+                            message = GetMessage();
+                            message = String.Format("{0}: {1}", userName, message);
+                            Console.WriteLine(message);
+                            server.BroadcastMessage(message, this.Id);
+                        }
                     }
                     catch
                     {
@@ -93,13 +95,10 @@ namespace TcpTestServer
             byte[] data = new byte[64]; // буфер для получаемых данных
             StringBuilder builder = new StringBuilder();
             int bytes = 0;
-            do
-            {
+            while (Stream.DataAvailable) {
                 bytes = Stream.Read(data, 0, data.Length);
                 builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
             }
-            while (Stream.DataAvailable);
-
             return builder.ToString();
         }
 
@@ -140,11 +139,16 @@ namespace TcpTestServer
 
                 while (true)
                 {
-                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
+                    if (tcpListener.Pending()) {
+                        TcpClient tcpClient = tcpListener.AcceptTcpClient();
 
-                    ClientObject clientObject = new ClientObject(tcpClient, this);
-                    Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
-                    clientThread.Start();
+                        ClientObject clientObject = new ClientObject(tcpClient, this);
+                        Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
+                        clientThread.Start();
+                    }
+                    try {
+                        Thread.Sleep(5);
+                    } catch { }
                 }
             }
             catch (Exception ex)
