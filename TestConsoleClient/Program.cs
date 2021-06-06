@@ -118,7 +118,8 @@ namespace TestConsoleClient {
 				}
 			} catch {
 				//Console.WriteLine("disconnect at writing");
-				Disconnect();
+				if (data != "\\disconnect")
+					Disconnect();
 			}
 		}
 
