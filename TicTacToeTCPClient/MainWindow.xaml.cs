@@ -132,6 +132,7 @@ namespace TicTacToeTCPClient {
 
 		private void Disconnect() {
 			if (client != null) {
+				WriteData("\\disconnect");
 				stream.Close();
 				client.Close();
 				client = null;

@@ -51,18 +51,20 @@ namespace TcpTestServer {
                     try {
                         message = GetMessage();
 						if (string.IsNullOrEmpty(message)) continue;
+                        if (message == "\\disconnect") throw new SocketException();
 						message = String.Format("{0}: {1}", userName, message);
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
-                    } catch {
+                    } catch (Exception e){
                         message = String.Format("{0} покинул чат", userName);
                         Console.WriteLine(message);
+                        //Console.WriteLine("exeption: " + e.ToString());
                         server.BroadcastMessage(message, this.Id);
                         break;
                     }
                 }
             } catch (Exception e) {
-                Console.WriteLine(e.Message);
+                Console.WriteLine($"error with client ({Id}){userName}: {e.Message}");
             } finally {
                 // в случае выхода из цикла закрываем ресурсы
                 server.RemoveConnection(this.Id);
@@ -80,6 +82,11 @@ namespace TcpTestServer {
                 builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
             } while (Stream.DataAvailable);
             return builder.ToString();
+        }
+
+        public void SendMessage(string msg) {
+            byte[] data = Encoding.Unicode.GetBytes(msg);
+            Stream.Write(data, 0, data.Length);
         }
 
         // закрытие подключения
@@ -101,7 +108,7 @@ namespace TcpTestServer {
         }
         protected internal void RemoveConnection(string id) {
             // получаем по id закрытое подключение
-            ClientObject client = clients.FirstOrDefault(c => c.Id == id);
+            ClientObject client = clients.Find(c => c.Id == id);
             // и удаляем его из списка подключений
             if (client != null)
                 clients.Remove(client);
@@ -133,11 +140,10 @@ namespace TcpTestServer {
 
         // трансляция сообщения подключенным клиентам
         protected internal void BroadcastMessage(string message, string id) {
-            byte[] data = Encoding.Unicode.GetBytes(message);
             for (int i = 0; i < clients.Count; i++) {
                 if (clients[i].Id != id) // если id клиента не равно id отправляющего
                 {
-                    clients[i].Stream.Write(data, 0, data.Length); //передача данных
+                    clients[i].SendMessage(message); //передача данных
                 }
             }
         }

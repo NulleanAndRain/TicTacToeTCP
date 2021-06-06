@@ -32,26 +32,29 @@ namespace TestConsoleClient {
 
 				//todo: connect to server
 
-				client = new TcpClient(IP, port);
-				stream = client.GetStream();
+				using (client = new TcpClient(IP, port)) {
+					stream = client.GetStream();
 
-				listeningThread = new Thread(ReadData);
-				listeningThread.Start();
+					listeningThread = new Thread(ReadData);
+					listeningThread.IsBackground = true;
+					listeningThread.Start();
 
-				consoleWritingThread = new Thread(WriteReceivedData);
-				consoleWritingThread.Start();
+					consoleWritingThread = new Thread(WriteReceivedData);
+					consoleWritingThread.IsBackground = true;
+					consoleWritingThread.Start();
 
-				WriteData(name);
+					WriteData(name);
 
-				//_ConnectionStatus.Content = "Connected";
-				Console.WriteLine("Connected");
+					//_ConnectionStatus.Content = "Connected";
+					Console.WriteLine("Connected");
 
-				while (client != null && client.Connected) {
-					var msg = Console.ReadLine();
-					WriteData(msg);
-					try {
-						Thread.Sleep(16);
-					} catch { }
+					while (client != null && client.Connected) {
+						var msg = Console.ReadLine();
+						WriteData(msg);
+						try {
+							Thread.Sleep(16);
+						} catch { }
+					}
 				}
 				Console.WriteLine("end reading data");
 			} catch (SocketException e) {
@@ -121,6 +124,8 @@ namespace TestConsoleClient {
 
 		public void Disconnect() {
 			if (client != null) {
+				WriteData("\\disconnect");
+				stream.Close();
 				client.Close();
 
 				client = null;
