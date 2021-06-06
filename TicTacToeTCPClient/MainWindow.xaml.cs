@@ -55,6 +55,11 @@ namespace TicTacToeTCPClient {
 			void updateUI() {
 				_ConnectionStatus.Content = "Disconnected";
 				_Connect_Btn.Content = "Connect";
+				_usr1.Content = "";
+				_usr2.Content = "";
+				_usr1.Background = transp;
+				_usr2.Background = transp;
+				test_area.Content = "";
 			}
 			_ConnectionStatus.Dispatcher.Invoke(updateUI);
 		}

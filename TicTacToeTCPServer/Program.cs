@@ -132,6 +132,12 @@ namespace TicTacToeTCPServer
 			}
 		}
 
+        void swapUsers() {
+            var tmp = client1;
+            client1 = client2;
+            client2 = tmp;
+		}
+
         string usrData(string id) {
             StringBuilder b = new StringBuilder("//usr ");
 
@@ -145,7 +151,7 @@ namespace TicTacToeTCPServer
             if (client2 != null) {
                 string usr2 = client2.userName;
                 int isUsr2 = client2.Id == id ? 1 : 0;
-                b.Append(usr2).Append(" ").Append(isUsr2).Append(" ");
+                b.Append(usr2).Append(" ").Append(isUsr2);
             } else {
                 b.Append(" 0");
             }
@@ -155,10 +161,17 @@ namespace TicTacToeTCPServer
         void sendUsrData() {
             if (client1 != null) {
                 client1.SendMessage(usrData(client1.Id));
+                Console.WriteLine("sent data to user 1");
             }
             if (client2 != null) {
                 client2.SendMessage(usrData(client2.Id));
+                Console.WriteLine("sent data to user 2");
             }
+        }
+
+        void remUserWithId(string id) {
+            if (client1 != null && client1.Id == id) client1 = null;
+            if (client2 != null && client2.Id == id) client2 = null;
         }
 
         protected internal void ProcessMessage(string message, string id) {
@@ -166,6 +179,7 @@ namespace TicTacToeTCPServer
             var cmd = args[0];
             if (cmd == "//add") {
                 // on connection
+                Console.WriteLine("add");
                 sendMessage($"//msg {args[1]} connected", id);
                 sendUsrData();
                 return;
@@ -176,8 +190,11 @@ namespace TicTacToeTCPServer
 			}
             if (cmd == "//rem") {
                 // on disconnect
-                sendMessage($"//msg {args[1]} disconected");
+                Console.WriteLine("rem");
+                remUserWithId(id);
+                if (client1 == null && client2 != null) swapUsers();
                 sendUsrData();
+                sendMessage($"//msg {args[1]} disconected", id);
                 return;
 			}
 		}
