@@ -136,6 +136,12 @@ namespace TicTacToeTCPServer
 			}
 		}
 
+        ClientObject getById(string id) {
+            if (client1 != null && client1.Id == id) return client1;
+            if (client2 != null && client2.Id == id) return client2;
+            return null;
+        }
+
         void swapUsers() {
             var tmp = client1;
             client1 = client2;
@@ -202,15 +208,37 @@ namespace TicTacToeTCPServer
                 var i2 = int.Parse(n2);
                 if (string.IsNullOrEmpty(field[i1, i2])) {
                     field[i1, i2] = currId;
+                    sendFieldData();
                     check();
                     currId = otherId(id);
                 }
 			}
 		}
 
+        void sendFieldData() {
+            StringBuilder b = new StringBuilder("//field ");
+
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    var str = "";
+                    if (!string.IsNullOrEmpty(field[i, j])) {
+                        var usr = getById(field[i, j]);
+                        if (usr == client1) str = "X";
+                        else str = "O";
+                    }
+                    b.Append(str).Append(",");
+                }
+                b.Append("|");
+            }
+            b.Remove(b.Length-2, 1);
+
+            //todo: get field data
+            sendMessage(b.ToString());
+        }
+
         void check() {
             //rows
-            int inRow = 0;
+            int inRow;
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size - rowSize; j++) {
                     string id = field[i, j];
@@ -229,7 +257,6 @@ namespace TicTacToeTCPServer
             }
 
             //columns
-            inRow = 0;
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size - rowSize; j++) {
                     string id = field[j, i];
@@ -248,7 +275,6 @@ namespace TicTacToeTCPServer
             }
 
             //diagonal
-            inRow = 0;
             for (int i = 0; i < size - rowSize; i++) {
                 for (int j = 0; j < size - rowSize; j++) {
                     string id = field[i, j];
@@ -265,12 +291,10 @@ namespace TicTacToeTCPServer
                     }
                 }
             }
-
-            inRow = 0;
         }
 
         void showWinner(string id) {
-
+            sendMessage($"//wnr {getById(id).userName}");
 		}
 
         void remUserWithId(string id) {
@@ -294,12 +318,15 @@ namespace TicTacToeTCPServer
                     if (!started) start();
                     var nums = args[3].Split(' ');
                     process(id, nums[0], nums[1]);
+                } else if (cmd == "//start") {
+                    start();
+                } else if (cmd == "//sz") {
+                    if (started) return;
+                    size = int.Parse(args[3]);
                 } else if (cmd == "//swp") {
                     if (started) return;
                     swapUsers();
                     sendUsrData();
-                } else if (cmd == "//start") {
-                    start();
                 } else {
                     sendMessage($"//msg {args[1]}: {args[2]}", id);
                 }
