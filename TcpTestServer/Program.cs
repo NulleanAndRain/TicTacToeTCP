@@ -64,7 +64,7 @@ namespace TcpTestServer {
                     }
                 }
             } catch (Exception e) {
-                Console.WriteLine($"error with client ({Id}){userName}: {e.Message}");
+                //Console.WriteLine($"error with client ({Id}){userName}: {e.Message}");
             } finally {
                 // в случае выхода из цикла закрываем ресурсы
                 server.RemoveConnection(this.Id);

@@ -37,16 +37,19 @@ namespace TicTacToeTCPServer
 				listener.Start();
 				Console.WriteLine("Сервер запущен. Ожидание подключений...");
 
-				while (true) {
-					TcpClient tcpClient = listener.AcceptTcpClient();
+                while (true) {
+                    if (listener.Pending()) {
+                        TcpClient tcpClient = listener.AcceptTcpClient();
 
-                    ClientObject clientObject = new ClientObject(tcpClient, this);
-
-                    clientObject.Init();
-					clients.Add(clientObject);
-					Thread.Sleep(5);
-				}
-			} catch (Exception ex) {
+                        ClientObject clientObject = new ClientObject(tcpClient, this);
+                        Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
+                        clientThread.Start();
+                    }
+                    try {
+                        Thread.Sleep(5);
+                    } catch { }
+                }
+            } catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 				Disconnect();
 			}
@@ -192,6 +195,8 @@ namespace TicTacToeTCPServer
                 while (true) {
                     try {
                         message = GetMessage();
+                        if (string.IsNullOrEmpty(message)) continue;
+                        if (message == "\\disconnect") throw new SocketException();
                         message = String.Format("{0}: {1}", userName, message);
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
@@ -203,7 +208,7 @@ namespace TicTacToeTCPServer
                     }
                 }
             } catch (Exception e) {
-                Console.WriteLine(e.Message);
+                //Console.WriteLine(e.Message);
             } finally {
                 // в случае выхода из цикла закрываем ресурсы
                 server.RemoveConnection(this.Id);
