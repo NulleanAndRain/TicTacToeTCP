@@ -132,20 +132,53 @@ namespace TicTacToeTCPServer
 			}
 		}
 
+        string usrData(string id) {
+            StringBuilder b = new StringBuilder("//usr ");
+
+            if (client1 != null) {
+                string usr1 = client1.userName;
+                int isUsr1 = client1.Id == id ? 1 : 0;
+                b.Append(usr1).Append(" ").Append(isUsr1).Append(" ");
+            } else {
+                b.Append(" 0 ");
+			}
+            if (client2 != null) {
+                string usr2 = client2.userName;
+                int isUsr2 = client2.Id == id ? 1 : 0;
+                b.Append(usr2).Append(" ").Append(isUsr2).Append(" ");
+            } else {
+                b.Append(" 0");
+            }
+            return b.ToString();
+        }
+
+        void sendUsrData() {
+            if (client1 != null) {
+                client1.SendMessage(usrData(client1.Id));
+            }
+            if (client2 != null) {
+                client2.SendMessage(usrData(client2.Id));
+            }
+        }
+
         protected internal void ProcessMessage(string message, string id) {
             var args = message.Split(' ', 3);
             var cmd = args[0];
             if (cmd == "//add") {
                 // on connection
-                sendMessage($"{args[1]} connected", id);
+                sendMessage($"//msg {args[1]} connected", id);
+                sendUsrData();
+                return;
             }
             if (cmd == "//msg") {
-                sendMessage($"{args[1]}: {args[2]}", id);
-
+                sendMessage($"//msg {args[1]}: {args[2]}", id);
+                return;
 			}
             if (cmd == "//rem") {
                 // on disconnect
-                sendMessage($"{args[1]} disconected");
+                sendMessage($"//msg {args[1]} disconected");
+                sendUsrData();
+                return;
 			}
 		}
     }

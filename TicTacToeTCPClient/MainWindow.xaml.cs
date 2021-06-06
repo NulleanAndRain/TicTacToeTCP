@@ -27,21 +27,27 @@ namespace TicTacToeTCPClient {
 		NetworkStream stream;
 		Thread listeningThread;
 
-		volatile Queue<string> recievedData;
-
 		[DllImport("Kernel32")]
 		public static extern void AllocConsole();
 		[DllImport("Kernel32")]
 		public static extern void FreeConsole();
 
+		Brush transp;
+		Brush green;
+
 		public MainWindow() {
-			recievedData = new Queue<string>();
+			Color _tr = Color.FromArgb(0, 0, 0, 0);
+			transp = new SolidColorBrush(_tr);
+			Color _gr = Color.FromRgb(142, 234, 42);
+			green = new SolidColorBrush(_gr);
 			InitializeComponent();
 
 			void close(object s, EventArgs e) {
 				Disconnect();
 			}
 			Closed += close;
+			_usr1.Background = transp;
+			_usr2.Background = transp;
 		}
 
 
@@ -58,6 +64,43 @@ namespace TicTacToeTCPClient {
 				test_area.Content += Environment.NewLine + msg;
 			}
 			test_area.Dispatcher.Invoke(update);
+		}
+
+		void processCmd(string command) {
+			var args = command.Split(' ');
+			var cmd = args[0];
+			if (cmd == "//msg") {
+				addText(command.Remove(0, 6));
+				return;
+			}
+			if (cmd == "//usr") {
+
+				void updateUser1() {
+					_usr1.Content = args[1];
+					void updBG() {
+						if (args[2] == "1") {
+							_usr1.Background = green;
+						} else {
+							_usr1.Background = transp;
+						}
+					}
+					_usr1.Background.Dispatcher.Invoke(updBG);
+				}
+				_usr1.Dispatcher.Invoke(updateUser1);
+
+				void updateUser2() {
+					_usr2.Content = args[3];
+					void updBG() {
+						if (args[4] == "1") {
+							_usr2.Background = green;
+						} else {
+							_usr2.Background = transp;
+						}
+					}
+					_usr2.Background.Dispatcher.Invoke(updBG);
+				}
+				_usr2.Dispatcher.Invoke(updateUser2);
+			}
 		}
 
 		private void ButtonConnect(object sender, RoutedEventArgs e) {
@@ -84,24 +127,10 @@ namespace TicTacToeTCPClient {
 				WriteData(_Name_text.Text);
 
 				_ConnectionStatus.Content = "Connected";
-
-				//while (true) {
-				//	if (recievedData.Count > 0) {
-				//		var msg = recievedData.Dequeue();
-				//		//Console.WriteLine(msg);
-				//	}
-				//	Thread.Sleep(16);
-				//}
-				//Thread.Sleep(100);
 			} catch (SocketException e) {
 				_ConnectionStatus.Content = $"SocketException: {e}";
-				//Console.WriteLine($"SocketException: {e}");
 			} catch (Exception e) {
-				//Console.WriteLine($"Exception: {e.Message}");
 				_ConnectionStatus.Content = $"Exception: {e.Message}";
-			} finally {
-				//_Connect_Btn.Content = "Connect";
-				//Disconnect();
 			}
 		}
 
@@ -117,12 +146,10 @@ namespace TicTacToeTCPClient {
 						builder.Append(Encoding.Unicode.GetString(buffer, 0, bytes));
 					}
 					var str = builder.ToString();
+					builder.Clear();
 					if (string.IsNullOrEmpty(str)) continue;
 
-					Console.WriteLine(str);
-					addText(str);
-					//recievedData.Enqueue(str);
-					builder.Clear();
+					processCmd(str);
 				} catch (Exception e) {
 					Console.WriteLine("---- ex:" + e.ToString());
 					Disconnect();
