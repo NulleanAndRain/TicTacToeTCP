@@ -209,5 +209,9 @@ namespace TicTacToeTCPClient {
 		private void BtnSwap(object sender, RoutedEventArgs e) {
 			WriteData("//swp");
 		}
+
+		private void BtnStart(object sender, RoutedEventArgs e) {
+			WriteData("//start");
+		}
 	}
 }
