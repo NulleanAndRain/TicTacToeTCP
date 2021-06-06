@@ -214,6 +214,12 @@ namespace TicTacToeTCPClient {
 			WriteData("//start");
 		}
 
+		private void SetFieldSize(int size) {
+			//if (size < 3) size = 3;
+			//if (size > 5) size = 5;
+		
+		}
+
 		private void Btn_size3(object sender, RoutedEventArgs e) {
 			WriteData("//sz 3");
 		}
