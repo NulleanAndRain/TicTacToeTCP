@@ -75,10 +75,11 @@ namespace TicTacToeTCPClient {
 				//	if (recievedData.Count > 0) {
 				//		var msg = recievedData.Dequeue();
 				//		test_area.Content += Environment.NewLine + msg;
-				//		Console.WriteLine(msg);
+				//		//Console.WriteLine(msg);
 				//	}
 				//	Thread.Sleep(16);
 				//}
+				Thread.Sleep(100);
 			} catch (SocketException e) {
 				_ConnectionStatus.Content = $"SocketException: {e}";
 				Console.WriteLine($"SocketException: {e}");
@@ -103,8 +104,11 @@ namespace TicTacToeTCPClient {
 						bytes = stream.Read(buffer, 0, buffer.Length);
 						builder.Append(Encoding.Unicode.GetString(buffer, 0, bytes));
 					}
+					var str = builder.ToString();
+					if (string.IsNullOrEmpty(str)) continue;
 
-					recievedData.Enqueue(builder.ToString());
+					Console.WriteLine(str);
+					recievedData.Enqueue(str);
 					builder.Clear();
 				} catch (Exception e) {
 					Console.WriteLine("---- ex:" + e.ToString());
@@ -128,17 +132,15 @@ namespace TicTacToeTCPClient {
 
 		private void Disconnect() {
 			if (client != null) {
-				// todo: disconect from server
 				stream.Close();
 				client.Close();
 				client = null;
 				stream = null;
 
-				listeningThread?.Interrupt();
+				listeningThread.Interrupt();
 				listeningThread = null;
+				Console.WriteLine("disconnect");
 			}
-			Console.WriteLine("disconnect");
-			//Thread.CurrentThread.Send
 		}
 
 		private void SendMsgBtn(object sender, RoutedEventArgs e) {
