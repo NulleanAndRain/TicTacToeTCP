@@ -100,7 +100,11 @@ namespace TicTacToeTCPServer
         }
     }
 
-    public class Room {
+	#endregion
+
+	#region Room
+
+	public class Room {
         public ClientObject client1;
         public ClientObject client2;
         public Server server1;
@@ -167,6 +171,108 @@ namespace TicTacToeTCPServer
             }
         }
 
+        //game data
+        int size = 3;
+        int rowSize = 3;
+        bool started = false;
+        string[,] field;
+        string currId;
+
+        string sendRoomData() {
+            return $"//rd {size}";
+		}
+        void start() {
+            if (client1 != null && client2 != null) {
+                sendMessage("//start");
+                started = true;
+                field = new string[size, size];
+                currId = client1.Id;
+            }
+
+        }
+
+        string otherId(string id) {
+            if (client1.Id == id) return client2.Id;
+            return client1.Id;
+		}
+
+        void process(string id, string n1, string n2) {
+            if(currId == id) {
+                var i1 = int.Parse(n1);
+                var i2 = int.Parse(n2);
+                if (string.IsNullOrEmpty(field[i1, i2])) {
+                    field[i1, i2] = currId;
+                    check();
+                    currId = otherId(id);
+                }
+			}
+		}
+
+        void check() {
+            //rows
+            int inRow = 0;
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size - rowSize; j++) {
+                    string id = field[i, j];
+                    inRow = 1;
+                    for (int d = 1; d < rowSize; d++) {
+                        if (field[i, j + d] != id) {
+                            break;
+						}
+                        inRow++;
+                        if (inRow == rowSize) {
+                            showWinner(id);
+                            return;
+                        }
+                    }
+				}
+            }
+
+            //columns
+            inRow = 0;
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size - rowSize; j++) {
+                    string id = field[j, i];
+                    inRow = 1;
+                    for (int d = 1; d < rowSize; d++) {
+                        if (field[j + d, i] != id) {
+                            break;
+                        }
+                        inRow++;
+                        if (inRow == rowSize) {
+                            showWinner(id);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            //diagonal
+            inRow = 0;
+            for (int i = 0; i < size - rowSize; i++) {
+                for (int j = 0; j < size - rowSize; j++) {
+                    string id = field[i, j];
+                    inRow = 1;
+                    for (int d = 1; d < rowSize; d++) {
+                        if (field[i + d, j + d] != id) {
+                            break;
+                        }
+                        inRow++;
+                        if (inRow == rowSize) {
+                            showWinner(id);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            inRow = 0;
+        }
+
+        void showWinner(string id) {
+
+		}
+
         void remUserWithId(string id) {
             if (client1 != null && client1.Id == id) client1 = null;
             if (client2 != null && client2.Id == id) client2 = null;
@@ -179,17 +285,26 @@ namespace TicTacToeTCPServer
                 // on connection
                 sendMessage($"//msg {args[1]} connected", id);
                 sendUsrData();
+                sendRoomData();
                 return;
             }
             if (cmd == "//msg") {
-                if (args[2] == "//swp") {
+                cmd = args[2];
+                if (cmd == "//gm") {
+                    if (!started) start();
+                    var nums = args[3].Split(' ');
+                    process(id, nums[0], nums[1]);
+                } else if (cmd == "//swp") {
+                    if (started) return;
                     swapUsers();
                     sendUsrData();
+                } else if (cmd == "//start") {
+                    start();
                 } else {
                     sendMessage($"//msg {args[1]}: {args[2]}", id);
                 }
                 return;
-			}
+            }
             if (cmd == "//rem") {
                 // on disconnect
                 remUserWithId(id);

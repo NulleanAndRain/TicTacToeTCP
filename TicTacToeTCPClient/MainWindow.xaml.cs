@@ -213,5 +213,17 @@ namespace TicTacToeTCPClient {
 		private void BtnStart(object sender, RoutedEventArgs e) {
 			WriteData("//start");
 		}
+
+		private void Btn_size3(object sender, RoutedEventArgs e) {
+			WriteData("//sz 3");
+		}
+
+		private void Btn_size4(object sender, RoutedEventArgs e) {
+			WriteData("//sz 4");
+		}
+
+		private void Btn_size5(object sender, RoutedEventArgs e) {
+			WriteData("//sz 5");
+		}
 	}
 }
