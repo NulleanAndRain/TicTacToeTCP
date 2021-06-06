@@ -12,7 +12,10 @@ namespace TicTacToeTCPServer
 {
 	class Program {
 		static void Main(string[] args) {
-			Server server = new Server("127.0.0.1", 8888);
+            Console.Write("Enter IP: ");
+            var ip = Console.ReadLine();
+            if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
+            Server server = new Server(ip, 8888);
 			server.Start();
 		}
 
@@ -110,9 +113,9 @@ namespace TicTacToeTCPServer
         int fieldSize;
         int rowSize;
 
-        void sendMessage(string message) {
-            if (client1 != null) client1.SendMessage(message);
-            if (client2 != null) client2.SendMessage(message);
+        void sendMessage(string message, string id) {
+            if (client1 != null && client1.Id != id) client1.SendMessage(message);
+            if (client2 != null && client2.Id != id) client2.SendMessage(message);
         }
 
         void CastRoomInfo() {
@@ -127,10 +130,10 @@ namespace TicTacToeTCPServer
         public void AddUser(ClientObject user) {
             if (client1 == null) {
                 client1 = user;
-                return;
-            }
-            if (client2 == null) {
+                user.room = this;
+            } else if (client2 == null) {
                 client2 = user;
+                user.room = this;
             }
         }
 
@@ -152,7 +155,7 @@ namespace TicTacToeTCPServer
             //if (inProcess && json["type"] == "game_data") {
 
             //}
-            sendMessage(message);
+            sendMessage(message, id);
 		}
     }
 
