@@ -112,12 +112,12 @@ namespace TicTacToeTCPClient {
 				_usr2.Dispatcher.Invoke(updateUser2);
 				return;
 			}
+			if (cmd == " //start")			{
+				_WinnerText.Content = "";
+			}
+
 			if (cmd == "//field") {
 				updateField(args[1]);
-			}
-			if (cmd == " //start")
-			{
-				_WinnerText.Content = "";
 			}
 			if (cmd == "//wnr")
 			{
@@ -126,6 +126,14 @@ namespace TicTacToeTCPClient {
 					_WinnerText.Content ="Winner: "+ args[1];
 				}
 				_WinnerText.Dispatcher.Invoke(update);
+			}
+			if (cmd == "//rd")
+			{
+				void update()
+				{
+					SetFieldSize(Int32.Parse(args[1]));
+				}
+				_Field.Dispatcher.Invoke(update);
 			}
 		}
 
