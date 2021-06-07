@@ -32,11 +32,14 @@
             <Button Content="5x5" HorizontalAlignment="Left" Margin="139,315,0,0" VerticalAlignment="Top" Width="30" Height="30" Click="Btn_size5"/>
         </Grid>
 
-        <Label x:Name="test_area" Content="" HorizontalAlignment="Left" Margin="607,26,0,0" VerticalAlignment="Top" Height="359" Width="175"/>
-        <TextBox x:Name="testInput" HorizontalAlignment="Left" Height="23" Margin="321,362,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Button  Content="Send" HorizontalAlignment="Left" Margin="464,362,0,0" VerticalAlignment="Top" Width="75" Click="SendMsgBtn" Height="23"/>
+        <ScrollViewer CanContentScroll="True" x:Name="_ChatSpace" Margin="562,10,10,0" Height="366" VerticalAlignment="Top">
+            <StackPanel x:Name="_Chat" Height="355" Width="207"/>
+        </ScrollViewer>
+        <TextBox x:Name="testInput" HorizontalAlignment="Left" Height="23" Margin="259,362,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Button  Content="Send" HorizontalAlignment="Left" Margin="402,362,0,0" VerticalAlignment="Top" Width="75" Click="SendMsgBtn" Height="23"/>
 
-        <Label x:Name="_WinnerText" Content="Winner:" HorizontalAlignment="Left" Margin="359,26,0,0" VerticalAlignment="Top" Width="180"/>
-        <StackPanel x:Name="_Field" HorizontalAlignment="Center" Height="272" Margin="321,57,190,90" VerticalAlignment="Center" Width="281" Orientation="Horizontal"/>
+        <Label x:Name="_WinnerText" Content="Winner:" HorizontalAlignment="Left" Margin="297,26,0,0" VerticalAlignment="Top" Width="180"/>
+        <StackPanel x:Name="_Field" HorizontalAlignment="Center" Height="272" Margin="259,57,252,90" VerticalAlignment="Center" Width="281" Orientation="Horizontal"/>
+        <Button Content="Clear chat" HorizontalAlignment="Left" Margin="632,390,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.08,0.15" Height="19" Click="BtnClearChat"/>
     </Grid>
 </Window>

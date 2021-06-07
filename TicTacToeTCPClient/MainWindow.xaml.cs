@@ -52,6 +52,7 @@ namespace TicTacToeTCPClient {
 			_WinnerText.Content = "";
 			_WinnerText.Background = transp;
 
+			_Chat.CanVerticallyScroll = false;
 			SetFieldSize(3);
 		}
 
@@ -64,13 +65,21 @@ namespace TicTacToeTCPClient {
 				_usr2.Content = "";
 				_usr1.Background = transp;
 				_usr2.Background = transp;
-				test_area.Content = "";
+				_Chat.Children.Clear();
+				//_ChatSpace.Children.Clear();
 
 				_WinnerText.Content = "";
 				_WinnerText.Background = transp;
 				clearField();
 			}
 			_ConnectionStatus.Dispatcher.Invoke(updateUI);
+		}
+
+		void clearChat() {
+			void upd() {
+				_Chat.Children.Clear();
+			}
+			_ChatSpace.Dispatcher.Invoke(upd);
 		}
 
 		void clearField() {
@@ -83,11 +92,19 @@ namespace TicTacToeTCPClient {
 		}
 
 		void addText(string msg) {
-			void update() {
-				test_area.Content += Environment.NewLine + msg;
+			void add() {
+				//_ChatSpace.Content += Environment.NewLine + msg;
+				var lbl = new Label();
+				lbl.Content = msg;
+				lbl.HorizontalAlignment = HorizontalAlignment.Stretch;
+				lbl.Height = 30;
+				_Chat.Children.Add(lbl);
+
+				_ChatSpace.ScrollToBottom();
 			}
-			test_area.Dispatcher.Invoke(update);
+			_ChatSpace.Dispatcher.Invoke(add);
 		}
+
 		void winnerText(string txt, bool isGreen) {
 			void updTxt() {
 				_WinnerText.Content = txt;
@@ -335,6 +352,10 @@ namespace TicTacToeTCPClient {
 
 		private void Btn_size5(object sender, RoutedEventArgs e) {
 			WriteData("//sz 5");
+		}
+
+		private void BtnClearChat(object sender, RoutedEventArgs e) {
+			clearChat();
 		}
 	}
 }
