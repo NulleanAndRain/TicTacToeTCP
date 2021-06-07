@@ -68,8 +68,18 @@ namespace TicTacToeTCPClient {
 
 				_WinnerText.Content = "";
 				_WinnerText.Background = transp;
+				clearField();
 			}
 			_ConnectionStatus.Dispatcher.Invoke(updateUI);
+		}
+
+		void clearField() {
+			void upd() {
+				foreach (var btn in btns) {
+					btn.Content = "";
+				}
+			}
+			_Field.Dispatcher.Invoke(upd);
 		}
 
 		void addText(string msg) {
@@ -92,7 +102,6 @@ namespace TicTacToeTCPClient {
 				_WinnerText.Background.Dispatcher.Invoke(updCol);
 			}
 			_WinnerText.Dispatcher.Invoke(updTxt);
-
 		}
 
 		void processCmd(string command) {
@@ -133,6 +142,7 @@ namespace TicTacToeTCPClient {
 			}
 			if (cmd == "//start") {
 				addText("---- game started ----");
+				clearField();
 				return;
 			}
 			if (cmd == "//field") {
@@ -141,6 +151,8 @@ namespace TicTacToeTCPClient {
 			}
 			if (cmd == "//wnr") {
 				winnerText("Winner: " + args[1], args[2] == "1");
+				addText("Winner: " + args[1]);
+				addText("---- game ended ----");
 				return;
 			}
 			if (cmd == "//rd") {
@@ -262,7 +274,7 @@ namespace TicTacToeTCPClient {
 		}
 
 		private void BtnStart(object sender, RoutedEventArgs e) {
-			WriteData("//start");
+			WriteData("//strt");
 		}
 
 		List<Button> btns = new List<Button>();

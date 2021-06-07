@@ -232,11 +232,11 @@ namespace TicTacToeTCPServer
                 if (string.IsNullOrEmpty(field[i1, i2])) {
                     field[i1, i2] = currId;
                     sendFieldData();
-					check();
 					currId = otherId(id);
+                    sendCurrPlayer();
+                    check();
                 }
             }
-            sendCurrPlayer();
         }
 
         void sendFieldData() {
@@ -264,16 +264,20 @@ namespace TicTacToeTCPServer
             //rows
             int inRow;
             for (int i = 0; i < size; i++) {
-                for (int j = 0; j < size - rowSize; j++) {
+                for (int j = 0; j < size - rowSize + 1; j++) {
                     string id = field[i, j];
                     if (string.IsNullOrEmpty(id)) continue;
                     inRow = 1;
+                    //Console.WriteLine($"checking row {i}: column {j}, id {id}");
                     for (int d = 1; d < rowSize; d++) {
                         if (field[i, j + d] != id) {
                             break;
 						}
                         inRow++;
+                        //Console.WriteLine($"--{d}: column {j + d},  {inRow}");
+
                         if (inRow == rowSize) {
+                            //Console.WriteLine("---- winner: " + id);
                             showWinner(id);
                             return;
                         }
@@ -283,16 +287,19 @@ namespace TicTacToeTCPServer
 
             //columns
             for (int i = 0; i < size; i++) {
-                for (int j = 0; j < size - rowSize; j++) {
+                for (int j = 0; j < size - rowSize + 1; j++) {
                     string id = field[j, i];
                     if (string.IsNullOrEmpty(id)) continue;
                     inRow = 1;
+                    //Console.WriteLine($"checking col {j}: row {i}, id {id}");
                     for (int d = 1; d < rowSize; d++) {
                         if (field[j + d, i] != id) {
                             break;
                         }
                         inRow++;
+                        //Console.WriteLine($"--{d}: row {i + d},  {inRow}");
                         if (inRow == rowSize) {
+                            //Console.WriteLine("---- winner: " + id);
                             showWinner(id);
                             return;
                         }
@@ -301,18 +308,44 @@ namespace TicTacToeTCPServer
             }
 
             //diagonal
-            for (int i = 0; i < size - rowSize; i++) {
-                for (int j = 0; j < size - rowSize; j++) {
+            for (int i = 0; i < size - rowSize + 1; i++) {
+                for (int j = 0; j < size - rowSize + 1; j++) {
                     string id = field[i, j];
                     if (string.IsNullOrEmpty(id)) continue;
+                    //Console.WriteLine($"checking diag from {i} {j}: id {id}");
                     inRow = 1;
                     for (int d = 1; d < rowSize; d++) {
                         if (field[i + d, j + d] != id) {
                             break;
                         }
                         inRow++;
+                        //Console.WriteLine($"--{d}: row {i + d}, col {j + d}, {inRow}");
                         if (inRow == rowSize) {
+                            //Console.WriteLine("---- winner: " + id);
                             showWinner(id);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            //Console.WriteLine("second diag check");
+            //second diagonal
+            for (int i = size - 1; i > -2 + rowSize; i--) {
+                for (int j = size - 1; j > -2 + rowSize; j--) {
+                    string id = field[i, j];
+                    if (string.IsNullOrEmpty(id)) continue;
+					Console.WriteLine($"checking diag from {i} {j}: id {id}");
+					inRow = 1;
+                    for (int d = 1; d < rowSize; d++) {
+                        if (field[i - d, j - d] != id) {
+                            break;
+                        }
+                        inRow++;
+						Console.WriteLine($"--{d}: row {i + d}, col {j + d}, {inRow}");
+						if (inRow == rowSize) {
+							Console.WriteLine("---- winner: " + id);
+							showWinner(id);
                             return;
                         }
                     }
@@ -328,6 +361,7 @@ namespace TicTacToeTCPServer
             client1?.SendMessage($"//wnr {usr.userName} {isUsr1}");
             client2?.SendMessage($"//wnr {usr.userName} {isUsr2}");
             started = false;
+            field = null;
 		}
 
         void remUserWithId(string id) {
@@ -352,8 +386,9 @@ namespace TicTacToeTCPServer
                 if (_cmd == "//gm") {
                     if (!started) start(id);
                     process(id, _args[1], _args[2]);
-                } else if (_cmd == "//start") {
-                    start();
+                } else if (_cmd == "//strt") {
+                    if (!started) start();
+                    sendCurrPlayer();
                 } else if (_cmd == "//sz") {
                     if (started) return;
                     size = int.Parse(_args[1]);
