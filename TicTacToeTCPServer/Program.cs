@@ -184,8 +184,8 @@ namespace TicTacToeTCPServer
         string[,] field;
         string currId;
 
-        string sendRoomData() {
-            return $"//rd {size}";
+        void sendRoomData() {
+            sendMessage($"//rd {size}");
 		}
         void start() {
             if (client1 != null && client2 != null) {
@@ -198,6 +198,7 @@ namespace TicTacToeTCPServer
         }
 
         string otherId(string id) {
+            if (client1 == client2) return null;
             if (client1?.Id == id) return client2?.Id;
             return client1.Id;
 		}
@@ -323,7 +324,7 @@ namespace TicTacToeTCPServer
                     process(id, _args[1], _args[2]);
                 } else if (_cmd == "//start") {
                     start();
-                } else if (cmd == "//sz") {
+                } else if (_cmd == "//sz") {
                     if (started) return;
                     size = int.Parse(_args[1]);
                     sendRoomData();

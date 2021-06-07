@@ -112,8 +112,11 @@ namespace TicTacToeTCPClient {
 				_usr2.Dispatcher.Invoke(updateUser2);
 				return;
 			}
-			if (cmd == " //start")			{
-				_WinnerText.Content = "";
+			if (cmd == " //start")	{
+				void upd() {
+					_WinnerText.Content = "";
+				}
+				_WinnerText.Dispatcher.Invoke(upd);
 			}
 
 			if (cmd == "//field") {
