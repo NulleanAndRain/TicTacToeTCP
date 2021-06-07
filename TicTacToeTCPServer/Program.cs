@@ -198,7 +198,7 @@ namespace TicTacToeTCPServer
         }
 
         string otherId(string id) {
-            if (client1.Id == id) return client2.Id;
+            if (client1?.Id == id) return client2?.Id;
             return client1.Id;
 		}
 
@@ -326,6 +326,7 @@ namespace TicTacToeTCPServer
                 } else if (cmd == "//sz") {
                     if (started) return;
                     size = int.Parse(_args[1]);
+                    sendRoomData();
                 } else if (_cmd == "//swp") {
                     if (started) return;
                     swapUsers();

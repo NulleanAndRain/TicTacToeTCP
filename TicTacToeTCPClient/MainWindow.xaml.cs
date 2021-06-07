@@ -254,7 +254,7 @@ namespace TicTacToeTCPClient {
 						WriteData(cmd);
 					}
 					btn.Content = "";
-					btn.Name = $"_{i}_{j}";
+					btn.Name = $"_{j}_{i}";
 					btn.Click += onClick;
 					btn.Width = 40;
 					btn.Height = 40;
@@ -270,8 +270,16 @@ namespace TicTacToeTCPClient {
 
 		void updateField(string data) {
 			var rows = data.Split('|');
-			foreach(var r in rows) {
-				addText(r);
+			for (int i = 0; i < rows.Length; i++) {
+				var cells = rows[i].Split(',');
+				for (int j = 0; j < cells.Length; j++) {
+					var btn = btns.Find(b => b.Name == $"_{j}_{i}");
+					void upd() {
+						btn.Content = cells[j];
+					}
+					btn.Dispatcher.Invoke(upd);
+				}
+				addText(rows[i]);
 			}
 		}
 
