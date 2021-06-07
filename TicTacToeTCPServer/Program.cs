@@ -48,7 +48,7 @@ namespace TicTacToeTCPServer
                         clientThread.Start();
                     }
                     try {
-                        Thread.Sleep(5);
+                        Thread.Sleep(16);
                     } catch { }
                 }
             } catch (Exception ex) {
@@ -65,6 +65,7 @@ namespace TicTacToeTCPServer
             ClientObject client = clients.Find(c => c.Id == id);
             // и удаляем его из списка подключений
             if (client != null) {
+                if (clients.Contains(client))
                 clients.Remove(client);
                 var r = client.room;
                 if (r == null) return;
@@ -193,8 +194,11 @@ namespace TicTacToeTCPServer
                 started = true;
                 field = new string[size, size];
                 currId = client1.Id;
+                sendCurrPlayer();
+            } else {
+                Console.WriteLine("1: ", client1 != null ? client1.Id + " | " + client1.userName : "null");
+                Console.WriteLine("2: ", client2 != null ? client2.Id + " | " + client2.userName : "null");
             }
-
         }
 
         string otherId(string id) {
@@ -249,6 +253,7 @@ namespace TicTacToeTCPServer
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size - rowSize; j++) {
                     string id = field[i, j];
+                    if (string.IsNullOrEmpty(id)) continue;
                     inRow = 1;
                     for (int d = 1; d < rowSize; d++) {
                         if (field[i, j + d] != id) {
@@ -267,6 +272,7 @@ namespace TicTacToeTCPServer
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size - rowSize; j++) {
                     string id = field[j, i];
+                    if (string.IsNullOrEmpty(id)) continue;
                     inRow = 1;
                     for (int d = 1; d < rowSize; d++) {
                         if (field[j + d, i] != id) {
@@ -285,6 +291,7 @@ namespace TicTacToeTCPServer
             for (int i = 0; i < size - rowSize; i++) {
                 for (int j = 0; j < size - rowSize; j++) {
                     string id = field[i, j];
+                    if (string.IsNullOrEmpty(id)) continue;
                     inRow = 1;
                     for (int d = 1; d < rowSize; d++) {
                         if (field[i + d, j + d] != id) {
@@ -301,7 +308,9 @@ namespace TicTacToeTCPServer
         }
 
         void showWinner(string id) {
-            SendMessage($"//wnr {getById(id).userName}");
+            var usr = getById(id);
+            if (usr == null) return;
+            SendMessage($"//wnr {usr.userName}");
             started = false;
 		}
 

@@ -113,13 +113,15 @@ namespace TicTacToeTCPClient {
 				return;
 			}
 			if (cmd == " //start")	{
-				void upd() {
-					_WinnerText.Content = "";
-				}
-				_WinnerText.Dispatcher.Invoke(upd);
+				//void upd() {
+				//	_WinnerText.Content = "";
+				//}
+				//_WinnerText.Dispatcher.Invoke(upd);
+				addText("---- game started ----");
 			}
 
 			if (cmd == "//field") {
+				addText(args[1] + Environment.NewLine);
 				updateField(args[1]);
 			}
 			if (cmd == "//wnr")
@@ -195,7 +197,10 @@ namespace TicTacToeTCPClient {
 					builder.Clear();
 					if (string.IsNullOrEmpty(str)) continue;
 
-					processCmd(str);
+					var cmds = str.Split(new string[] {"//"}, 16, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var cmd in cmds) {
+						processCmd("//" + cmd);
+					}
 				} catch (Exception e) {
 					Console.WriteLine("---- ex:" + e.ToString());
 					Disconnect();
