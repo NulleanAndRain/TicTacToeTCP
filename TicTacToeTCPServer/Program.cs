@@ -112,7 +112,7 @@ namespace TicTacToeTCPServer
         public bool hasSpace => client1 == null || client2 == null;
         public bool isEmpty => client1 == null && client2 == null;
 
-        void sendMessage(string message, string exceptId = null) {
+        void SendMessage(string message, string exceptId = null) {
             if (client1 != null && client1.Id != exceptId) client1.SendMessage(message);
             if (client2 != null && client2.Id != exceptId) client2.SendMessage(message);
         }
@@ -185,11 +185,11 @@ namespace TicTacToeTCPServer
         string currId;
 
         void sendRoomData() {
-            sendMessage($"//rd {size}");
+            SendMessage($"//rd {size}");
 		}
         void start() {
             if (client1 != null && client2 != null) {
-                sendMessage("//start");
+                SendMessage("//start");
                 started = true;
                 field = new string[size, size];
                 currId = client1.Id;
@@ -203,6 +203,10 @@ namespace TicTacToeTCPServer
             return client1.Id;
 		}
 
+        void sendCurrPlayer() {
+            SendMessage($"//cur {getById(currId).userName}");
+		}
+
         void process(string id, string n1, string n2) {
             if(currId == id) {
                 var i1 = int.Parse(n1);
@@ -210,6 +214,7 @@ namespace TicTacToeTCPServer
                 if (string.IsNullOrEmpty(field[i1, i2])) {
                     field[i1, i2] = currId;
                     sendFieldData();
+                    sendCurrPlayer();
                     check();
                     currId = otherId(id);
                 }
@@ -235,7 +240,7 @@ namespace TicTacToeTCPServer
             b.Remove(b.Length - 1, 1);
 
             //todo: get field data
-            sendMessage(b.ToString());
+            SendMessage(b.ToString());
         }
 
         void check() {
@@ -296,7 +301,7 @@ namespace TicTacToeTCPServer
         }
 
         void showWinner(string id) {
-            sendMessage($"//wnr {getById(id).userName}");
+            SendMessage($"//wnr {getById(id).userName}");
             started = false;
 		}
 
@@ -310,7 +315,7 @@ namespace TicTacToeTCPServer
             var cmd = args[0];
             if (cmd == "//add") {
                 // on connection
-                sendMessage($"//msg {args[1]} connected", id);
+                SendMessage($"//msg {args[1]} connected", id);
                 sendUsrData();
                 sendRoomData();
                 return;
@@ -318,7 +323,7 @@ namespace TicTacToeTCPServer
             if (cmd == "//msg") {
                 var _args = args[2].Split(' ');
                 var _cmd = _args[0];
-                sendMessage($"cmd: {_cmd}");
+                SendMessage($"cmd: {_cmd}");
                 if (_cmd == "//gm") {
                     if (!started) start();
                     process(id, _args[1], _args[2]);
@@ -333,7 +338,7 @@ namespace TicTacToeTCPServer
                     swapUsers();
                     sendUsrData();
                 } else {
-                    sendMessage($"//msg {args[1]}: {args[2]}", id);
+                    SendMessage($"//msg {args[1]}: {args[2]}", id);
                 }
                 return;
             }
@@ -346,7 +351,7 @@ namespace TicTacToeTCPServer
                     showWinner(otherId(id));
                 }
 
-                sendMessage($"//msg {args[1]} disconected", id);
+                SendMessage($"//msg {args[1]} disconected", id);
                 return;
 			}
 		}

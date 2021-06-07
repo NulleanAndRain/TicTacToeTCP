@@ -138,7 +138,7 @@ namespace TicTacToeTCPClient {
 				}
 				_Field.Dispatcher.Invoke(update);
 			}
-			if (cmd == "//??")
+			if (cmd == "//cur")
             {
 				void update()
 				{
