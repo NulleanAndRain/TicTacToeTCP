@@ -138,6 +138,15 @@ namespace TicTacToeTCPClient {
 				}
 				_Field.Dispatcher.Invoke(update);
 			}
+			if (cmd == "//??")
+            {
+				void update()
+				{
+					_WinnerText.Content = "Player turn: " + args[1];
+				}
+				_WinnerText.Dispatcher.Invoke(update);
+			}
+
 		}
 
 		private void ButtonConnect(object sender, RoutedEventArgs e) {
