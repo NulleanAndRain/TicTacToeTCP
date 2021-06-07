@@ -228,9 +228,10 @@ namespace TicTacToeTCPServer
                     }
                     b.Append(str).Append(",");
                 }
+                b.Remove(b.Length - 1, 1);
                 b.Append("|");
             }
-            b.Remove(b.Length-2, 1);
+            b.Remove(b.Length - 1, 1);
 
             //todo: get field data
             sendMessage(b.ToString());
@@ -295,6 +296,7 @@ namespace TicTacToeTCPServer
 
         void showWinner(string id) {
             sendMessage($"//wnr {getById(id).userName}");
+            started = false;
 		}
 
         void remUserWithId(string id) {
@@ -313,17 +315,18 @@ namespace TicTacToeTCPServer
                 return;
             }
             if (cmd == "//msg") {
-                cmd = args[2];
-                if (cmd == "//gm") {
+                var _args = args[2].Split(' ');
+                var _cmd = _args[0];
+                sendMessage($"cmd: {_cmd}");
+                if (_cmd == "//gm") {
                     if (!started) start();
-                    var nums = args[3].Split(' ');
-                    process(id, nums[0], nums[1]);
-                } else if (cmd == "//start") {
+                    process(id, _args[1], _args[2]);
+                } else if (_cmd == "//start") {
                     start();
                 } else if (cmd == "//sz") {
                     if (started) return;
-                    size = int.Parse(args[3]);
-                } else if (cmd == "//swp") {
+                    size = int.Parse(_args[1]);
+                } else if (_cmd == "//swp") {
                     if (started) return;
                     swapUsers();
                     sendUsrData();
@@ -337,6 +340,10 @@ namespace TicTacToeTCPServer
                 remUserWithId(id);
                 if (client1 == null && client2 != null) swapUsers();
                 sendUsrData();
+                if (started) {
+                    showWinner(otherId(id));
+                }
+
                 sendMessage($"//msg {args[1]} disconected", id);
                 return;
 			}

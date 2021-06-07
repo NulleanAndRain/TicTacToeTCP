@@ -108,6 +108,10 @@ namespace TicTacToeTCPClient {
 					_usr2.Background.Dispatcher.Invoke(updBG);
 				}
 				_usr2.Dispatcher.Invoke(updateUser2);
+				return;
+			}
+			if (cmd == "//field") {
+				updateField(args[1]);
 			}
 		}
 
@@ -218,11 +222,12 @@ namespace TicTacToeTCPClient {
 			WriteData("//start");
 		}
 
+		List<Button> btns = new List<Button>();
 		private void SetFieldSize(int size) {
 			//if (size < 3) size = 3;
 			//if (size > 5) size = 5;
-			//int sz = 30;
 			_Field.Children.Clear();
+			btns.Clear();
 			for (int i = 0; i < size; i++) {
 				var col = new StackPanel();
 				col.Width = 50;
@@ -230,8 +235,9 @@ namespace TicTacToeTCPClient {
 				col.HorizontalAlignment = HorizontalAlignment.Center;
 				for (int j = 0; j < size; j++) {
 					var btn = new Button();
+					var cmd = $"//gm {j} {i}";
 					void onClick(object sender, RoutedEventArgs e) {
-						WriteData($"//gm {i} {j}");
+						WriteData(cmd);
 					}
 					btn.Content = "";
 					btn.Name = $"_{i}_{j}";
@@ -242,11 +248,19 @@ namespace TicTacToeTCPClient {
 					btn.HorizontalAlignment = HorizontalAlignment.Center;
 					btn.VerticalAlignment = VerticalAlignment.Center;
 					col.Children.Add(btn);
+					btns.Add(btn);
 				}
 				_Field.Children.Add(col);
 			}
-			//_StackHor
 		}
+
+		void updateField(string data) {
+			var rows = data.Split('|');
+			foreach(var r in rows) {
+				addText(r);
+			}
+		}
+
 
 		private void Btn_size3(object sender, RoutedEventArgs e) {
 			WriteData("//sz 3");
