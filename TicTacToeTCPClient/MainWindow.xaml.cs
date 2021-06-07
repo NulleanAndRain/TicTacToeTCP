@@ -48,13 +48,15 @@ namespace TicTacToeTCPClient {
 			Closed += close;
 			_usr1.Background = transp;
 			_usr2.Background = transp;
+
 			_WinnerText.Content = "";
+			_WinnerText.Background = transp;
 
 			SetFieldSize(3);
 		}
 
 
-		void showDisconnect() {
+		void onDisconnect() {
 			void updateUI() {
 				_ConnectionStatus.Content = "Disconnected";
 				_Connect_Btn.Content = "Connect";
@@ -63,6 +65,8 @@ namespace TicTacToeTCPClient {
 				_usr1.Background = transp;
 				_usr2.Background = transp;
 				test_area.Content = "";
+
+				_WinnerText.Content = "";
 			}
 			_ConnectionStatus.Dispatcher.Invoke(updateUI);
 		}
@@ -73,21 +77,23 @@ namespace TicTacToeTCPClient {
 			}
 			test_area.Dispatcher.Invoke(update);
 		}
-		//virtual winnerText(string command,  string str)
-		//{
-		//	var args = command.Split(' ');
-		//	var cmd = args[0];
-		//	if (cmd == "//cur")
-		//	{
-		//		void update()
-		//		{
-		//			_WinnerText.Content = "Player turn: " + args[1];
-		//		}
-		//		_WinnerText.Dispatcher.Invoke(update);
-		//	}
-		//}
+		void winnerText(string txt, bool isGreen) {
+			void updTxt() {
+				_WinnerText.Content = txt;
+			}
+			_WinnerText.Dispatcher.Invoke(updTxt);
 
-	void processCmd(string command) {
+			void updCol() {
+				if (isGreen) {
+					_WinnerText.Background = green;
+				} else {
+					_WinnerText.Background = transp;
+				}
+			}
+			_WinnerText.Background.Dispatcher.Invoke(updCol);
+		}
+
+		void processCmd(string command) {
 			var args = command.Split(' ');
 			var cmd = args[0];
 			if (cmd == "//msg") {
@@ -123,43 +129,27 @@ namespace TicTacToeTCPClient {
 				_usr2.Dispatcher.Invoke(updateUser2);
 				return;
 			}
-			if (cmd == " //start")	{
-				//void upd() {
-				//	_WinnerText.Content = "";
-				//}
-				//_WinnerText.Dispatcher.Invoke(upd);
+			if (cmd == " //start") {
 				addText("---- game started ----");
 			}
 
 			if (cmd == "//field") {
+				addText("game data:");
 				addText(args[1] + Environment.NewLine);
 				updateField(args[1]);
 			}
-			if (cmd == "//wnr")
-			{
-				void update()
-				{
-					_WinnerText.Content ="Winner: "+ args[1];
-				}
-				_WinnerText.Dispatcher.Invoke(update);
+			if (cmd == "//wnr") {
+				winnerText("Winner: " + args[1], args[2] == "1");
 			}
-			if (cmd == "//rd")
-			{
-				void update()
-				{
+			if (cmd == "//rd") {
+				void update() {
 					SetFieldSize(Int32.Parse(args[1]));
 				}
 				_Field.Dispatcher.Invoke(update);
 			}
-			if (cmd == "//cur")
-            {
-				void update()
-				{
-					_WinnerText.Content = "Player turn: " + args[1];
-				}
-				_WinnerText.Dispatcher.Invoke(update);
+			if (cmd == "//cur") {
+				winnerText("Player turn: " + args[1], args[2] == "1");
 			}
-
 		}
 
 		private void ButtonConnect(object sender, RoutedEventArgs e) {
@@ -174,7 +164,6 @@ namespace TicTacToeTCPClient {
 			try {
 				_Connect_Btn.Content = "Disconnect";
 
-				//todo: connect to server
 				var port = int.Parse(_Port_text.Text);
 
 				client = new TcpClient(_IP_text.Text, port);
@@ -196,7 +185,6 @@ namespace TicTacToeTCPClient {
 		void ReadData() {
 			StringBuilder builder = new StringBuilder();
 			while (client!= null && client.Connected) {
-				// todo: data reading
 				try {
 					byte[] buffer = new byte[256];
 					int bytes;
@@ -244,6 +232,7 @@ namespace TicTacToeTCPClient {
 
 		private void Disconnect() {
 			if (client != null) {
+				WriteData("//msg disconnceting...");
 				WriteData("\\disconnect");
 				stream.Close();
 				client.Close();
@@ -252,7 +241,7 @@ namespace TicTacToeTCPClient {
 
 				listeningThread.Interrupt();
 				listeningThread = null;
-				showDisconnect();
+				onDisconnect();
 			}
 		}
 
@@ -274,8 +263,6 @@ namespace TicTacToeTCPClient {
 
 		List<Button> btns = new List<Button>();
 		private void SetFieldSize(int size) {
-			//if (size < 3) size = 3;
-			//if (size > 5) size = 5;
 			_Field.Children.Clear();
 			btns.Clear();
 			for (int i = 0; i < size; i++) {
@@ -322,17 +309,14 @@ namespace TicTacToeTCPClient {
 
 		private void Btn_size3(object sender, RoutedEventArgs e) {
 			WriteData("//sz 3");
-			SetFieldSize(3);
 		}
 
 		private void Btn_size4(object sender, RoutedEventArgs e) {
 			WriteData("//sz 4");
-			SetFieldSize(4);
 		}
 
 		private void Btn_size5(object sender, RoutedEventArgs e) {
 			WriteData("//sz 5");
-			SetFieldSize(5);
 		}
 	}
 }

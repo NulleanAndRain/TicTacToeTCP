@@ -65,7 +65,6 @@ namespace TicTacToeTCPServer
             ClientObject client = clients.Find(c => c.Id == id);
             // и удаляем его из списка подключений
             if (client != null) {
-                if (clients.Contains(client))
                 clients.Remove(client);
                 var r = client.room;
                 if (r == null) return;
@@ -412,7 +411,8 @@ namespace TicTacToeTCPServer
                         message = $"//msg {userName} {message}";
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
-                    } catch {
+                    } catch (Exception e) {
+                        Console.WriteLine(e.Message);
                         message = $"//rem {userName}";
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
@@ -420,8 +420,8 @@ namespace TicTacToeTCPServer
                     }
                 }
             } catch (Exception e) {
-                //Console.WriteLine(e.Message);
-            } finally {
+				Console.WriteLine(e.Message);
+			} finally {
                 // в случае выхода из цикла закрываем ресурсы
                 server.RemoveConnection(this.Id);
                 Close();
