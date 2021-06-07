@@ -74,6 +74,8 @@ namespace TicTacToeTCPClient {
 			test_area.Dispatcher.Invoke(update);
 		}
 
+	
+
 		void processCmd(string command) {
 			var args = command.Split(' ');
 			var cmd = args[0];
@@ -112,6 +114,18 @@ namespace TicTacToeTCPClient {
 			}
 			if (cmd == "//field") {
 				updateField(args[1]);
+			}
+			if (cmd == " //start")
+			{
+				_WinnerText.Content = "";
+			}
+			if (cmd == "//wnr")
+			{
+				void update()
+				{
+					_WinnerText.Content ="Winner: "+ args[1];
+				}
+				_WinnerText.Dispatcher.Invoke(update);
 			}
 		}
 
