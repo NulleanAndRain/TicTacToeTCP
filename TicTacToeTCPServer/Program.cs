@@ -61,18 +61,20 @@ namespace TicTacToeTCPServer
             findEmptyRoom().AddUser(clientObject);
         }
         protected internal void RemoveConnection(string id) {
-            // получаем по id закрытое подключение
-            ClientObject client = clients.Find(c => c.Id == id);
-            // и удаляем его из списка подключений
-            if (client != null) {
-                clients.Remove(client);
-                var r = client.room;
-                if (r == null) return;
-                r.RemoveUser(client);
-                if (r.isEmpty) {
-                    rooms.Remove(r);
+            try {
+                // получаем по id закрытое подключение
+                ClientObject client = clients.Find(c => c.Id == id);
+                // и удаляем его из списка подключений
+                if (client != null) {
+                    clients.Remove(client);
+                    var r = client.room;
+                    if (r == null) return;
+                    r.RemoveUser(client);
+                    if (r.isEmpty) {
+                        rooms.Remove(r);
+                    }
                 }
-            }
+            } catch { }
         }
 
         Room findEmptyRoom() {
@@ -187,12 +189,20 @@ namespace TicTacToeTCPServer
         void sendRoomData() {
             SendMessage($"//rd {size}");
 		}
-        void start() {
+        void start(string id = null) {
             if (client1 != null && client2 != null) {
                 SendMessage("//start");
                 started = true;
                 field = new string[size, size];
-                currId = client1.Id;
+                if (id == null) {
+                    currId = client1.Id;
+                } else {
+                    if (id == client2.Id) {
+                        swapUsers();
+                        sendUsrData();
+					}
+                    currId = id;
+				}
                 sendCurrPlayer();
             } else {
                 Console.WriteLine("1: ", client1 != null ? client1.Id + " | " + client1.userName : "null");
@@ -209,10 +219,10 @@ namespace TicTacToeTCPServer
         void sendCurrPlayer() {
             var curr = getById(currId);
             if (curr == null) return;
-            string isUsr1 = client1.Id == currId ? "1" : "";
-            string isUsr2 = client2.Id == currId ? "1" : "";
-            client1.SendMessage($"//cur {curr.userName} {isUsr1}");
-            client2.SendMessage($"//cur {curr.userName} {isUsr2}");
+            string isUsr1 = client1?.Id == currId ? "1" : "";
+            string isUsr2 = client2?.Id == currId ? "1" : "";
+            client1?.SendMessage($"//cur {curr.userName} {isUsr1}");
+            client2?.SendMessage($"//cur {curr.userName} {isUsr2}");
         }
 
         void process(string id, string n1, string n2) {
@@ -222,12 +232,12 @@ namespace TicTacToeTCPServer
                 if (string.IsNullOrEmpty(field[i1, i2])) {
                     field[i1, i2] = currId;
                     sendFieldData();
-                    sendCurrPlayer();
-                    //check();
-                    currId = otherId(id);
+					check();
+					currId = otherId(id);
                 }
-			}
-		}
+            }
+            sendCurrPlayer();
+        }
 
         void sendFieldData() {
             StringBuilder b = new StringBuilder("//field ");
@@ -246,11 +256,10 @@ namespace TicTacToeTCPServer
                 b.Append("|");
             }
             b.Remove(b.Length - 1, 1);
-
-            //todo: get field data
             SendMessage(b.ToString());
         }
 
+        // todo: fix winner checking
         void check() {
             //rows
             int inRow;
@@ -314,10 +323,10 @@ namespace TicTacToeTCPServer
         void showWinner(string id) {
             var usr = getById(id);
             if (usr == null) return;
-            string isUsr1 = client1.Id == id ? "1" : "";
-            string isUsr2 = client2.Id == id ? "1" : "";
-            client1.SendMessage($"//wnr {usr.userName} {isUsr1}");
-            client2.SendMessage($"//wnr {usr.userName} {isUsr2}");
+            string isUsr1 = client1?.Id == id ? "1" : "";
+            string isUsr2 = client2?.Id == id ? "1" : "";
+            client1?.SendMessage($"//wnr {usr.userName} {isUsr1}");
+            client2?.SendMessage($"//wnr {usr.userName} {isUsr2}");
             started = false;
 		}
 
@@ -341,7 +350,7 @@ namespace TicTacToeTCPServer
                 var _cmd = _args[0];
                 SendMessage($"cmd: {_cmd}");
                 if (_cmd == "//gm") {
-                    if (!started) start();
+                    if (!started) start(id);
                     process(id, _args[1], _args[2]);
                 } else if (_cmd == "//start") {
                     start();

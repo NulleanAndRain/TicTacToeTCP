@@ -67,6 +67,7 @@ namespace TicTacToeTCPClient {
 				test_area.Content = "";
 
 				_WinnerText.Content = "";
+				_WinnerText.Background = transp;
 			}
 			_ConnectionStatus.Dispatcher.Invoke(updateUI);
 		}
@@ -131,12 +132,10 @@ namespace TicTacToeTCPClient {
 				return;
 			}
 			if (cmd == "//start") {
-				//addText("---- game started ----");
+				addText("---- game started ----");
 				return;
 			}
 			if (cmd == "//field") {
-				addText("game data:");
-				addText(args[1] + Environment.NewLine);
 				updateField(args[1]);
 				return;
 			}
@@ -297,18 +296,20 @@ namespace TicTacToeTCPClient {
 		}
 
 		void updateField(string data) {
-			var rows = data.Split('|');
-			for (int i = 0; i < rows.Length; i++) {
-				var cells = rows[i].Split(',');
-				for (int j = 0; j < cells.Length; j++) {
-					var btn = btns.Find(b => b.Name == $"_{j}_{i}");
-					void upd() {
-						btn.Content = cells[j];
+			void updField() {
+				var rows = data.Split('|');
+				for (int i = 0; i < rows.Length; i++) {
+					var cells = rows[i].Split(',');
+					for (int j = 0; j < cells.Length; j++) {
+						var btn = btns.Find(b => b.Name == $"_{i}_{j}");
+						void upd() {
+							btn.Content = cells[j];
+						}
+						btn.Dispatcher.Invoke(upd);
 					}
-					btn.Dispatcher.Invoke(upd);
 				}
-				addText(rows[i]);
 			}
+			_Field.Dispatcher.Invoke(updField);
 		}
 
 
