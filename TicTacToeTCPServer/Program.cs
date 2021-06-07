@@ -23,9 +23,9 @@ namespace TicTacToeTCPServer
 	#region Server alt
 	public class Server {
 		TcpListener listener;
-		List<ClientObject> clients;
+        volatile List<ClientObject> clients;
 
-        List<Room> rooms;
+        volatile List<Room> rooms;
 
 		public Server(string IP, int port) {
 			clients = new List<ClientObject>();
@@ -207,8 +207,13 @@ namespace TicTacToeTCPServer
 		}
 
         void sendCurrPlayer() {
-            SendMessage($"//cur {getById(currId).userName}");
-		}
+            var curr = getById(currId);
+            if (curr == null) return;
+            string isUsr1 = client1.Id == currId ? "1" : "";
+            string isUsr2 = client2.Id == currId ? "1" : "";
+            client1.SendMessage($"//cur {curr.userName} {isUsr1}");
+            client2.SendMessage($"//cur {curr.userName} {isUsr2}");
+        }
 
         void process(string id, string n1, string n2) {
             if(currId == id) {
@@ -218,7 +223,7 @@ namespace TicTacToeTCPServer
                     field[i1, i2] = currId;
                     sendFieldData();
                     sendCurrPlayer();
-                    check();
+                    //check();
                     currId = otherId(id);
                 }
 			}
@@ -309,7 +314,10 @@ namespace TicTacToeTCPServer
         void showWinner(string id) {
             var usr = getById(id);
             if (usr == null) return;
-            SendMessage($"//wnr {usr.userName}");
+            string isUsr1 = client1.Id == id ? "1" : "";
+            string isUsr2 = client2.Id == id ? "1" : "";
+            client1.SendMessage($"//wnr {usr.userName} {isUsr1}");
+            client2.SendMessage($"//wnr {usr.userName} {isUsr2}");
             started = false;
 		}
 

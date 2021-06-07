@@ -80,17 +80,18 @@ namespace TicTacToeTCPClient {
 		void winnerText(string txt, bool isGreen) {
 			void updTxt() {
 				_WinnerText.Content = txt;
+
+				void updCol() {
+					if (isGreen) {
+						_WinnerText.Background = green;
+					} else {
+						_WinnerText.Background = transp;
+					}
+				}
+				_WinnerText.Background.Dispatcher.Invoke(updCol);
 			}
 			_WinnerText.Dispatcher.Invoke(updTxt);
 
-			void updCol() {
-				if (isGreen) {
-					_WinnerText.Background = green;
-				} else {
-					_WinnerText.Background = transp;
-				}
-			}
-			_WinnerText.Background.Dispatcher.Invoke(updCol);
 		}
 
 		void processCmd(string command) {
@@ -129,26 +130,30 @@ namespace TicTacToeTCPClient {
 				_usr2.Dispatcher.Invoke(updateUser2);
 				return;
 			}
-			if (cmd == " //start") {
-				addText("---- game started ----");
+			if (cmd == "//start") {
+				//addText("---- game started ----");
+				return;
 			}
-
 			if (cmd == "//field") {
 				addText("game data:");
 				addText(args[1] + Environment.NewLine);
 				updateField(args[1]);
+				return;
 			}
 			if (cmd == "//wnr") {
 				winnerText("Winner: " + args[1], args[2] == "1");
+				return;
 			}
 			if (cmd == "//rd") {
 				void update() {
 					SetFieldSize(Int32.Parse(args[1]));
 				}
 				_Field.Dispatcher.Invoke(update);
+				return;
 			}
 			if (cmd == "//cur") {
 				winnerText("Player turn: " + args[1], args[2] == "1");
+				return;
 			}
 		}
 
@@ -178,6 +183,7 @@ namespace TicTacToeTCPClient {
 			} catch (SocketException e) {
 				_ConnectionStatus.Content = $"SocketException: {e}";
 			} catch (Exception e) {
+				Console.WriteLine("----- Ex: " + e.ToString());
 				_ConnectionStatus.Content = $"Exception: {e.Message}";
 			}
 		}
@@ -232,7 +238,6 @@ namespace TicTacToeTCPClient {
 
 		private void Disconnect() {
 			if (client != null) {
-				WriteData("//msg disconnceting...");
 				WriteData("\\disconnect");
 				stream.Close();
 				client.Close();
