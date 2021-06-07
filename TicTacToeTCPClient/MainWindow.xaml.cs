@@ -73,10 +73,21 @@ namespace TicTacToeTCPClient {
 			}
 			test_area.Dispatcher.Invoke(update);
 		}
+		//virtual winnerText(string command,  string str)
+		//{
+		//	var args = command.Split(' ');
+		//	var cmd = args[0];
+		//	if (cmd == "//cur")
+		//	{
+		//		void update()
+		//		{
+		//			_WinnerText.Content = "Player turn: " + args[1];
+		//		}
+		//		_WinnerText.Dispatcher.Invoke(update);
+		//	}
+		//}
 
-	
-
-		void processCmd(string command) {
+	void processCmd(string command) {
 			var args = command.Split(' ');
 			var cmd = args[0];
 			if (cmd == "//msg") {
