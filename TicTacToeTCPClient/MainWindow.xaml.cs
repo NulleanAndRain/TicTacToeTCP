@@ -97,7 +97,7 @@ namespace TicTacToeTCPClient {
 				var lbl = new Label();
 				lbl.Content = msg;
 				lbl.HorizontalAlignment = HorizontalAlignment.Stretch;
-				lbl.Height = 30;
+				lbl.MinHeight = 25;
 				_Chat.Children.Add(lbl);
 
 				_ChatSpace.ScrollToBottom();

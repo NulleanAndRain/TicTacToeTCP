@@ -331,28 +331,39 @@ namespace TicTacToeTCPServer
 
             //Console.WriteLine("second diag check");
             //second diagonal
-            for (int i = size - 1; i > -2 + rowSize; i--) {
-                for (int j = size - 1; j > -2 + rowSize; j--) {
-                    string id = field[i, j];
+            for (int i = 0; i < size - rowSize + 1; i++) {
+                var k = size - i - 1;
+                for (int j = 0; j < size - rowSize + 1; j++) {
+                    string id = field[k, j];
+                    Console.WriteLine($"checking diag from {k} {j}: id {id}");
                     if (string.IsNullOrEmpty(id)) continue;
-					Console.WriteLine($"checking diag from {i} {j}: id {id}");
 					inRow = 1;
                     for (int d = 1; d < rowSize; d++) {
-                        if (field[i - d, j - d] != id) {
+                        if (field[k - d, j + d] != id) {
                             break;
                         }
                         inRow++;
-						Console.WriteLine($"--{d}: row {i + d}, col {j + d}, {inRow}");
-						if (inRow == rowSize) {
-							Console.WriteLine("---- winner: " + id);
-							showWinner(id);
+                        //Console.WriteLine($"--{d}: row {i + d}, col {j + d}, {inRow}");
+                        if (inRow == rowSize) {
+                            //Console.WriteLine("---- winner: " + id);
+                            showWinner(id);
                             return;
                         }
                     }
                 }
+
             }
+
+            int count = 0;
+            foreach (var c in field) {
+                if (!string.IsNullOrEmpty(c)) count++;
+			}
+            if (count == size * size) noWinner();
         }
 
+        void noWinner() {
+            SendMessage("//wnr Draw ");
+		}
         void showWinner(string id) {
             var usr = getById(id);
             if (usr == null) return;
@@ -380,6 +391,7 @@ namespace TicTacToeTCPServer
                 return;
             }
             if (cmd == "//msg") {
+                // on command messaging
                 var _args = args[2].Split(' ');
                 var _cmd = _args[0];
                 SendMessage($"cmd: {_cmd}");
@@ -472,7 +484,7 @@ namespace TicTacToeTCPServer
                     }
                 }
             } catch (Exception e) {
-				Console.WriteLine(e.Message);
+				//Console.WriteLine(e.Message);
 			} finally {
                 // в случае выхода из цикла закрываем ресурсы
                 server.RemoveConnection(this.Id);
