@@ -259,7 +259,6 @@ namespace TicTacToeTCPServer
             SendMessage(b.ToString());
         }
 
-        // todo: fix winner checking
         void check() {
             //rows
             int inRow;
@@ -268,16 +267,12 @@ namespace TicTacToeTCPServer
                     string id = field[i, j];
                     if (string.IsNullOrEmpty(id)) continue;
                     inRow = 1;
-                    //Console.WriteLine($"checking row {i}: column {j}, id {id}");
                     for (int d = 1; d < rowSize; d++) {
                         if (field[i, j + d] != id) {
                             break;
 						}
                         inRow++;
-                        //Console.WriteLine($"--{d}: column {j + d},  {inRow}");
-
                         if (inRow == rowSize) {
-                            //Console.WriteLine("---- winner: " + id);
                             showWinner(id);
                             return;
                         }
@@ -291,15 +286,12 @@ namespace TicTacToeTCPServer
                     string id = field[j, i];
                     if (string.IsNullOrEmpty(id)) continue;
                     inRow = 1;
-                    //Console.WriteLine($"checking col {j}: row {i}, id {id}");
                     for (int d = 1; d < rowSize; d++) {
                         if (field[j + d, i] != id) {
                             break;
                         }
                         inRow++;
-                        //Console.WriteLine($"--{d}: row {i + d},  {inRow}");
                         if (inRow == rowSize) {
-                            //Console.WriteLine("---- winner: " + id);
                             showWinner(id);
                             return;
                         }
@@ -312,16 +304,13 @@ namespace TicTacToeTCPServer
                 for (int j = 0; j < size - rowSize + 1; j++) {
                     string id = field[i, j];
                     if (string.IsNullOrEmpty(id)) continue;
-                    //Console.WriteLine($"checking diag from {i} {j}: id {id}");
                     inRow = 1;
                     for (int d = 1; d < rowSize; d++) {
                         if (field[i + d, j + d] != id) {
                             break;
                         }
                         inRow++;
-                        //Console.WriteLine($"--{d}: row {i + d}, col {j + d}, {inRow}");
                         if (inRow == rowSize) {
-                            //Console.WriteLine("---- winner: " + id);
                             showWinner(id);
                             return;
                         }
@@ -329,13 +318,11 @@ namespace TicTacToeTCPServer
                 }
             }
 
-            //Console.WriteLine("second diag check");
             //second diagonal
             for (int i = 0; i < size - rowSize + 1; i++) {
                 var k = size - i - 1;
                 for (int j = 0; j < size - rowSize + 1; j++) {
                     string id = field[k, j];
-                    Console.WriteLine($"checking diag from {k} {j}: id {id}");
                     if (string.IsNullOrEmpty(id)) continue;
 					inRow = 1;
                     for (int d = 1; d < rowSize; d++) {
@@ -343,9 +330,7 @@ namespace TicTacToeTCPServer
                             break;
                         }
                         inRow++;
-                        //Console.WriteLine($"--{d}: row {i + d}, col {j + d}, {inRow}");
                         if (inRow == rowSize) {
-                            //Console.WriteLine("---- winner: " + id);
                             showWinner(id);
                             return;
                         }
